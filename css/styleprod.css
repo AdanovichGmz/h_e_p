@@ -1,0 +1,284 @@
+ body{
+overflow:hidden;
+
+ }
+ 
+ 
+ .cont2{
+           
+           width: 60%;
+    height: 70%;
+    position: absolute;
+    top: 50px;
+    left: 20%;
+            
+        }
+
+
+#contenedor{
+    width:100%;
+    height:100%;
+      
+    position: absolute;
+}
+
+.banner{
+    width:100%;
+      height: 7%;
+    position: absolute;
+   
+}
+.imgbanner {
+    background-image: url('../images/paper.png');
+    width: 100%;
+    height: 100%;
+    background-repeat: repeat-x;
+   
+    position: absolute;
+    z-index:-1;
+}
+.usuario{
+       color: white;
+    font-size: 20pt;
+    width: 40%;
+    top: 15%;
+    left:35%;
+    position: absolute;
+}
+.fechayhora{
+       color: white;
+       font-size: 26pt;
+    width: 25%;
+    top: 0%;
+    right: 4%;
+    position: absolute;
+}
+
+#hora{
+    color: white;
+    font-size: 26pt;
+    width: 25%;
+    top: 0%;
+    right: 6%;
+    position: absolute;
+}
+
+.row1{
+    width:100%;
+    height:5%;
+    position:absolute;
+    margin-top:6%;
+    /*background-color:blue;*/
+}
+.maquina{
+    background-color: transparent;
+    border: 0px;
+    font-size: 18pt;
+    top:-37px;
+    position:absolute;
+    /*left: 40%; */
+    width: 170px;
+    color:white;
+    
+}
+
+.row2{
+     width:100%;
+    height:32%;
+    position:absolute;
+    margin-top:9%;
+    
+}
+
+
+.rowfyp{
+    top:0;
+    
+    height:35%;
+    width:90%;
+    position:absolute;
+    /*background-color:gray;*/
+    z-index:2;
+}
+.porcentaje {
+    height:70px; 
+    width:120px;
+    right: 0;
+    margin: 10px;
+    position: absolute;
+    
+    
+}
+.inpuporcentaje{
+    height: 70px;
+    width: 90px;
+    border: 0px;
+    background-color: #00B050;
+    color: white;
+    font-size: 40pt;
+    text-align: center;
+    left: 8px;
+    position: relative;
+
+}
+.signo{
+
+    height: 70px;
+    width: 48px;
+    background-color: #00B050;
+    color: white;
+    font-size: 40pt;
+    position: relative;
+    top: -70px;
+    right: -98px;
+}
+.imagen{
+    left:15px;
+    position:absolute;
+        top: 4px;
+    
+}
+.foto{
+    width:80px;
+    height:80px;
+}
+.rowprox{
+    top:35%;
+    height:65%;
+    width:90%;
+    position:absolute;
+    /*background-color:olivedrab;*/
+    z-index:3;
+}
+
+.fila1, .fila2, .fila3{
+    width:100%;
+    height:33%;
+    position:absolute;
+   
+}
+.fila1{
+    top:0;
+    /*background-color:silver;*/
+}
+.fila2{
+    top:33%;
+    /*background-color:green;*/
+}
+.fila3{
+    top:66%;
+    /*background-color:powderblue;*/
+}
+
+.divnegro{
+      background-color: black;
+    margin: 15px;
+    width: 50%;
+    height: 50%;
+    position: relative;
+   
+}
+
+.tareas{
+     text-align:center;
+    color:white;
+    font-size:12pt;
+    margin:5px;
+
+}
+.tarea1{
+      margin: 15px;
+    /* width: 36%; */
+    height: 50%;
+    position: absolute;
+    right: 10px;
+  
+}
+
+
+.txt{
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    border: 0px solid #000000;
+     padding: 0 4px 0 4px;
+     width: 100px; 
+     position: relative;
+    right: -37px;
+       background-color: #00B050; 
+       border:0; text-align:center;
+        color:white; 
+        font-size:14pt
+}
+
+
+.operador, .operador5 {
+    left: 3%;
+       
+}
+.operador2, .operador6 {   
+    left:27%;
+}
+
+.operador3, .operador7{   
+    right:28%;
+}
+
+.operador4, .operador8{  
+    right:3%;
+}
+
+.operador, .operador2, .operador3, .operador4, .operador5, .operador6, .operador7, .operador8{
+
+    height: 100%;
+    width: 21%;
+    position:absolute;
+    background-color:#022F63;
+
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    border: 0px solid #000000;
+     padding: 0 4px 0 4px;
+}
+
+
+
+
+.row3{
+  
+     width:100%;
+    height:32%;
+    position:absolute;
+    
+    bottom: 35px;
+   
+
+}
+
+
+
+
+
+
+.diseños{
+    width: 150px;
+    height: 25px;
+    margin:2px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    border: 0px solid #000000;
+     padding: 0 4px 0 4px;
+         color: black;
+}
+
+
+.msj{
+        display:none;
+    }
+
+
+
+
+

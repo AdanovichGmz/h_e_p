@@ -62,7 +62,7 @@ if (@$_SESSION['logged_in'] != true) {
         $ip  = getenv("REMOTE_ADDR");
         $cmd = "arp  $ip | grep $ip | awk '{ print $3 }'"; ?>
         <div style="display: none;">
-        <?php $recoverMac         = system($cmd); ?>
+        <?php $recoverMac         =system($cmd); // '5c:f5:da:2f:33:5e'; ?>
         </div>
         <?php
         //$recoverMac         = $_SESSION['nommaquina'];
@@ -106,7 +106,7 @@ if (@$_SESSION['logged_in'] != true) {
         }
         
         
-        $numodt = (isset($_POST['numodt'])) ? $_POST['numodt'] : '';
+        $numodt[] = $stoppedOrderID;
         
         $query2      = "SELECT id FROM login WHERE logged_in='$logged_in'";
         $query4      = "SELECT * FROM maquina WHERE mac='$recoverMac'";

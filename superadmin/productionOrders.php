@@ -125,7 +125,7 @@ function getCheckStatus($id_process,$process){
        <div class="orderdata">Fecha Fin: <?=$fila['fechafin']; ?></div>
       <br>
      <div class="inputs" id="inputs-<?=$fila['idorden'] ?>"> 
-       <div id="Original-<?=$fila['idorden'] ?>" class="checgroup">
+       <div id="Original-<?=$fila['idorden'] ?>" class="checgroup" oncontextmenu="javascript:alert('success!');return false;">
          <div class="checkicon <?=getCheckStatus($fila['idorden'],'Original');?>"   onclick="checking(<?=$fila['idorden'] ?>,'Original-<?=$fila['idorden'] ?>');">
          <input type="checkbox" class="chk" value="Original" name=  "procesos_<?=$fila['idorden'] ?>[]"    >
          </div>

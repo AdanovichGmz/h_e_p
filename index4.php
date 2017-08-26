@@ -1,7 +1,9 @@
 <?php
 date_default_timezone_set("America/Mexico_City");
 require('saves/conexion.php');
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 if ($_POST['qty']=='single') {
  
 $producto=(isset($_POST['producto'])) ?$_POST['producto'] : '';

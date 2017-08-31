@@ -404,6 +404,7 @@ $(".sort").each(function() {
 
         $('#goto').keypress(function(e) {
     if(e.which == 13) {
+      event.preventDefault();
       $('.remark').removeClass('remark').fadeIn(3000);
       var odt=$('#goto').val();
       

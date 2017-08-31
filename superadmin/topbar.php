@@ -45,11 +45,11 @@
         
         <!--<li><a href="#"><span class="icon-earth"></span>Servicios</a></li>-->
         <!--<li><a href="#"><span class="icon-mail"></span>Contacto</a></li> -->
-       <li><a href="estandares.php">Estandares</a></li> 
+       <li><a href="estandares.php">Estandares</a></li>
+       <li><a href="programacion.php">Programacion</a></li>  
       </ul>
     </nav>
      
   </header>
    
-  
  

@@ -136,23 +136,28 @@ if(@$_SESSION['logged_in'] != true){
   border-collapse: collapse;
   text-align: center;
   margin: auto;
-  background-color: #393939;
+  background-color: #fff;
+}
+thead td{
+  color: #545A8E;
 }
 
 th, td {
   padding: 0.25rem;
-  border-top: 1px solid #444444!important;
+  border: 1px solid #E6E8E7!important;
  /* border: 1px solid black; */
 }
 tbody tr:nth-child(odd) {
-  background: #333333;
+  background: #F9F9F9;
 }
 tr input{
-  color:#000;
+  color:#545A8E;
   text-align: center;
   border:none;
   border-radius: 3px;
   padding: 3px;
+  background: #EFEFEF ;
+border: 1px solid #CACACA; 
 }
 
 #buscar{
@@ -176,7 +181,7 @@ td{
     overflow: auto; 
     
     left: 1%;
-    color: white;
+    color: #00927B;
 }
 .left-form2{
   width: 20%!important;
@@ -194,6 +199,7 @@ box-shadow: 3px 4px 18px 0px rgba(0,0,0,0.75);
 .tDnD_whileDrag td{
    border-bottom:1px solid #fff!important;
    border-top:1px solid #fff!important;
+   color: #fff;
 }
 .remark{
   background: #2980B9!important;
@@ -201,13 +207,14 @@ box-shadow: 3px 4px 18px 0px rgba(0,0,0,0.75);
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
     transition: all 0.5s ease;
+    color: #fff;
 }
 .remark td{
    border-bottom:1px solid #fff!important;
    border-top:1px solid #fff!important;
 }
 #noresults{
-  color: #fff; position: absolute;
+  color: #FF4945; position: absolute;
 }
 
   </style>

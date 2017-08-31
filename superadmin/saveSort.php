@@ -61,8 +61,8 @@ if ( $resultado) {
     <input type="hidden" name="process-name" value="<?=$string ?>">
       <table class="order-table table hoverable" id="table-program">
 
-              <thead class="color" style="background-color: #212121;">
-                 <tr style="background-color: #212121;">
+              <thead class="" style="">
+                 <tr style="">
                          
                           <td   class="tabla"><strong >ODT</strong></td>
                           

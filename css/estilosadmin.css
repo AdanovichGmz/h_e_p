@@ -411,7 +411,7 @@ position: relative;
 	background:#474747;
 }
 .hoverable tbody>tr:hover{
-	background:#474747;
+	background:#F2EDED;
 }
 .tabla{
    text-align: center;
@@ -561,26 +561,28 @@ border-top: 1px solid #444444!important;
 }
 .left-form{
 	width: 31%;
-	background-color: #383838;
+	background-color: #fff;
 	height: 80px;
 	display:inline-block;
 	border-radius: 5px;
 	margin: 10px;
 	position: relative;
 	vertical-align: top;
+	border: 1px solid #E6E8E7;
 }
 .left-form2{
 	width: 31%;
-	background-color: #383838;
+	background-color: #fff;
 	height: 80px;
 	display:inline-block;
 	border-radius: 5px;
 	margin: 10px;
 	vertical-align: top;
+	border: 1px solid #E6E8E7;
 	
 }
 .left-form2 p{
-	color:#fff;
+	color:#02979B;
 	text-align: center;
 	margin-top: 5px;
 }
@@ -592,7 +594,7 @@ border-top: 1px solid #444444!important;
 }
 .left-form input, select{
 	border-radius: 3px;
-	border:none;
+	border: 1px solid #ccc;
 	padding: 4px;
 }
 .mini-left{
@@ -794,7 +796,7 @@ writing-mode: vertical-rl;
 	box-sizing: border-box;
 }
 
-body {background:#2B2B2B; position: fixed; width: 100%;height: 100%;}
+body {background:#EFEFEF; position: fixed; width: 100%;height: 100%;}
 
 .menu_bar {
 	display:none;
@@ -805,7 +807,7 @@ header {
 }
 
 header nav {
-	background:#030303;
+	background:#272B34;
 	z-index:1000;
 	max-width: 100%;
 	
@@ -829,6 +831,7 @@ header nav {
 }
 header nav ul {
 	list-style:none;
+	border-bottom: 1px solid #1F242A;
 }
 .fix-header{
 	width: 100%;
@@ -867,7 +870,7 @@ header nav ul li:hover:not(.nohover) {
 }
 
 header nav ul li a:not(.salir) {
-	color:#fff;
+	color:#D5CDBA;
 	display:block;
 	text-decoration:none;
 	padding: 20px;

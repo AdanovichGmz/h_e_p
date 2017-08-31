@@ -57,7 +57,7 @@ if (@$_SESSION['logged_in'] != true) {
 
   
 </head>
-<body style="">
+<body style="background: #2B2B2B;">
 
 <?php
 include("topbar.php");

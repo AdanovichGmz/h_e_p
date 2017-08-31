@@ -810,7 +810,7 @@ header nav {
 	background:#272B34;
 	z-index:1000;
 	max-width: 100%;
-	
+	font-size: 14px!important;
 	margin:0 auto;
 }
 .labels{
@@ -866,7 +866,7 @@ header nav ul li {
 }
 
 header nav ul li:hover:not(.nohover) {
-	background:#1E5B84;
+	background:#1F242A;
 }
 
 header nav ul li a:not(.salir) {
@@ -886,7 +886,7 @@ header nav ul li:hover .children {
 
 header nav ul li .children {
 	display: none;
-	background:#2980B9;
+	background:#05BDE3;
 	position: absolute;
 	width: 150%;
 	z-index:1000;
@@ -900,6 +900,7 @@ header nav ul li .children li {
 
 header nav ul li .children li a {
 	display: block;
+	color: #fff;
 }
 
 header nav ul li .children li a span {

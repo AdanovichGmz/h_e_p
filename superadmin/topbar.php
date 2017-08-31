@@ -31,8 +31,9 @@
                         <li><a href="#">Encuesta<span class="icon-question"></span></a></li>
           </ul>
         </li>
-        <li class="lefting nohover">
-         <span class="button-labels"><a class="salir" href="logoutadmin.php" ><div class="admin-button"><img src="../images/salir.png"></div></a></span>
+        <li class="lefting ">
+
+         <a class="" href="logoutadmin.php" style="color:#fff;"><span class="icon-exit"></span> Salir</a>
         </li>
         <!--
         <li class="lefting nohover">

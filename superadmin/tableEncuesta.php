@@ -10,9 +10,9 @@
     
   <div class="datagrid" >
 
-          <table class="order-table table hoverable" >
-                  <thead class="color">
-                    <tr style="background-color: #212121;">
+          <table class="order-table table hoverable lightable" >
+                  <thead >
+                    <tr >
                       <td width="1%"><b></b></td>
                       <td width="1%"><b></b></td>
                       <td width="4%"  class="tabla"><strong >ID</strong></td>

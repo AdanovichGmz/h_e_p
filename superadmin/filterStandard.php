@@ -41,10 +41,10 @@ require('../saves/conexion.php');
     
     <div class="datagrid">
     
-      <table class="order-table table hoverable" >
+      <table class="order-table table hoverable lightable" >
 
-              <thead class="color" style="background-color: #212121;">
-                 <tr style="background-color: #212121;">
+              <thead class="color" >
+                 <tr >
                           <td ><b></b></td>
                           <td ><b></b></td>
                           <td   class="tabla"><strong >TIEMPO DE AJUSTE ESTANDAR</strong></td>

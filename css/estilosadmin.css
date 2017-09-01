@@ -1,3 +1,23 @@
+
+   .lightable {
+  border-collapse: collapse;
+  text-align: center;
+  margin: auto;
+  background-color: #fff;
+  color: #00927B;
+}
+.lightable thead td{
+  color: #545A8E;
+}
+.lightable th, .lightable td {
+  padding: 0.25rem;
+  border: 1px solid #E6E8E7!important;
+ /* border: 1px solid black; */
+}
+.lightable tbody tr:nth-child(odd) {
+  background: #F9F9F9;
+}
+
 .page-link{
 	
 }
@@ -404,11 +424,11 @@ position: relative;
 
 }
 #tableData tbody>tr:hover{
-	background:#474747;
+	
 
 }
 #ajuste-tabla tbody>tr:hover{
-	background:#474747;
+	
 }
 .hoverable tbody>tr:hover{
 	background:#F2EDED;
@@ -685,7 +705,7 @@ writing-mode: vertical-rl;
  
 	}	
 .txt_tit{
-	color: white;
+	color: #C7D1DB;
 	 padding: 3px;
 
 
@@ -735,27 +755,7 @@ writing-mode: vertical-rl;
 
 }
 
-#buscar{
-	width: 240px;
-	font-size: 18px;
-	color:black;
-	background: #383838 ;
-	padding-left: 20px ;
-	text-align: center;
-	border-radius: 5px;
-	padding: 10px;
-	margin:10px;
-	z-index: 49;
-	position: absolute;
-	right: 0; 
 
-}
-#buscar input{
-	border:none;
-	padding: 4px;
-	border-radius: 3px;
-
-}
 .paginator{
 	width: 100%;
 	text-align: center;
@@ -829,7 +829,7 @@ header nav {
 .lefting{
 	float: right;
 }
-header nav ul {
+header nav ul:not(.children) {
 	list-style:none;
 	border-bottom: 1px solid #1F242A;
 }
@@ -860,9 +860,12 @@ box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.31);
     transform: translate(-50%, -50%);
 
 }
-header nav ul li {
+header nav ul li:not(.children) {
 	display:inline-block;
 	position: relative;
+	
+	border-right: 1px solid #1F242A;
+	border-collapse: collapse;
 }
 
 header nav ul li:hover:not(.nohover) {
@@ -896,6 +899,7 @@ header nav ul li .children li {
 	display:block;
 	overflow: hidden;
 	border-bottom: 1px solid rgba(255,255,255,.5);
+	border-right: none!important;
 }
 
 header nav ul li .children li a {

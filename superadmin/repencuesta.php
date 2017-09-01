@@ -103,33 +103,20 @@ if(@$_SESSION['logged_in'] != true){
   body {
   font: normal medium/1.4 sans-serif;
 }
-    table {
-  border-collapse: collapse;
-  text-align: center;
-  margin: auto;
-  background-color: #393939;
-}
-
-th, td {
-  padding: 0.25rem;
-  border-top: 1px solid #444444!important;
- /* border: 1px solid black; */
-}
-tbody tr:nth-child(odd) {
-  background: #333333;
-}
-
-
-#buscar{
+ #buscar{
   width: 300px;
   font-size: 18px;
   color:black;
-  background: #383838 ;
+  background: #fff ;
   padding-left: 20px ;
   text-align: center;
   border-radius: 5px;
   padding: 10px;
-  margin:10px; 
+  margin:10px;
+  border: 1px solid #E6E8E7; 
+}
+#buscar input{
+  border:1px solid #ccc;
 }
 
   </style>

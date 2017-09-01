@@ -132,21 +132,7 @@ if(@$_SESSION['logged_in'] != true){
   body {
   font: normal medium/1.4 sans-serif;
 }
-      table {
-  border-collapse: collapse;
-  text-align: center;
-  margin: auto;
-  background-color: #393939;
-}
-
-th, td {
-  padding: 0.25rem;
-  border-top: 1px solid #444444!important;
- /* border: 1px solid black; */
-}
-tbody tr:nth-child(odd) {
-  background: #333333;
-}
+   
 
 
 #buscar{

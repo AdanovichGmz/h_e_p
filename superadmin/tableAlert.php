@@ -13,10 +13,10 @@ if ( $resultado) {
     
     <div class="datagrid">
     
-      <table class="order-table table hoverable" >
+      <table class="order-table table hoverable lightable" >
 
-              <thead class="color" style="background-color: #212121;">
-                 <tr style="background-color: #212121;">
+              <thead class="" ">
+                 <tr >
                           <td width="1%"><b></b></td>
                           <td width="1%"><b></b></td>
                           <td width="2%"  class="tabla"><strong >ID</strong></td>

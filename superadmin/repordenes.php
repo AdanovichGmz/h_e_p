@@ -189,21 +189,7 @@ require('../saves/conexion.php');
   body {
   font: normal medium/1.4 sans-serif;
 }
-      table {
-  border-collapse: collapse;
-  text-align: center;
-  margin: auto;
-   background-color: #393939;
-}
-
-th, td {
-  padding: 0.25rem;
- border-top: 1px solid #444444!important;
-
-}
-tbody tr:nth-child(odd) {
-   background: #333333;
-}
+   
 
 
 
@@ -270,9 +256,9 @@ tbody tr:nth-child(odd) {
  
 <div class="conttabla2"  >
 
-<table id="tableData" class="order-table table" >
+<table id="tableData" class="order-table table lightable hoverable" >
                   <thead  class="color">
-                    <tr style="background-color: #212121; ">
+                    <tr ">
                   
                       <td width="2%"  class="tabla"><strong>ID</strong></td>
                       <td width="2%"  class="tabla"><strong>ODT</strong></td>

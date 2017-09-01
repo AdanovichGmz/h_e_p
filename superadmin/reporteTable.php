@@ -54,7 +54,7 @@
         });
       }
     </script>
-        <table id="ajuste-tabla" class="order-table table" >
+        <table id="ajuste-tabla" class="order-table table hoverable lightable" >
                   <thead  class="">
                     <tr style="">
                       <td width="1%"><b></b></td>

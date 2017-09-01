@@ -53,11 +53,32 @@ if (@$_SESSION['logged_in'] != true) {
   .bkloader img{
     width: 100%;
   }
+  #buscar{
+  width: 240px;
+  font-size: 18px;
+  color:black;
+  background: #181820;
+  padding-left: 20px ;
+  text-align: center;
+  border-radius: 5px;
+  padding: 10px;
+  margin:10px;
+  z-index: 49;
+  position: absolute;
+  right: 0; 
+
+}
+#buscar input{
+  border:none;
+  padding: 4px;
+  border-radius: 3px;
+
+}
 </style>
 
   
 </head>
-<body style="background: #2B2B2B;">
+<body style="background:#1F242A;">
 
 <?php
 include("topbar.php");

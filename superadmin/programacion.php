@@ -73,7 +73,6 @@ if(@$_SESSION['logged_in'] != true){
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   
 
-
     <link href="../css/estilosadmin.css" rel="stylesheet" />
 
    
@@ -216,6 +215,13 @@ box-shadow: 3px 4px 18px 0px rgba(0,0,0,0.75);
 #noresults{
   color: #FF4945; position: absolute;
 }
+.timer-container{
+  width: 100%;
+  height: 80px;
+  line-height: 80px;
+  font-size: 20px;
+  color: #00927B
+}
 
   </style>
   
@@ -229,18 +235,13 @@ box-shadow: 3px 4px 18px 0px rgba(0,0,0,0.75);
  <div class="top-form">
 
   <div class="left-form2">
- <!--
-   <p style="margin-bottom: 2px!important;">Filtrar por Elemento</p>
-   <input type="hidden" name="activef" value="ok">
-   <div class=""><select id="filterElem" name="dateFilter">
-   <option disabled="true" selected="true">Elige el elemento</option>
-     <?php while($rowf=mysqli_fetch_assoc($filter)){ ?>
-     <option value="<?=$rowf['id_elemento']?>"><?=getElement($rowf['id_elemento']) ?></option>
-     <?php } ?>
-   </select>
-<input hidden  name="datepicker" id="fechadeldia" value="<?php echo date("d/m/Y"); ?>" />
-   </div>
-   -->
+ <div class="timer-container">
+                                    <div id="chronoExample">
+                                    <div id="timer"><span class="values">00:00:00</span></div>
+                                    
+                                   
+                                </div>
+                                </div>
  
  </div>
  
@@ -300,7 +301,10 @@ box-shadow: 3px 4px 18px 0px rgba(0,0,0,0.75);
   </div>
   </div>
 </form>
+<script src="../js/easytimer.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script>
+  var timer = new Timer();
                         /* function startTime() {
                             today = new Date();
                             h = today.getHours();
@@ -390,6 +394,7 @@ $(".sort").each(function() {
     
 
         $( "#filterProces" ).change(function() {
+          timer.stop();
         var emlem_id= $( "#filterProces" ).val();
         $.ajax({  
                       
@@ -401,13 +406,45 @@ $(".sort").each(function() {
                        
                           //$('#update-form')[0].reset();  
                           //$('.close2').click();  
-                          $('.div-tabla').html(data);  
+                          $('.div-tabla').html(data); 
+                          reload(emlem_id); 
                      }  
                 });
+       
 
 
  
 });
+        
+        function reload(emlem_id){
+          timer.start({countdown: true, startValues: {seconds: 60}});
+
+            timer.addEventListener('secondsUpdated', function (e) {
+                $('#chronoExample .values').html(timer.getTimeValues().toString());
+            });
+            timer.addEventListener('started', function (e) {
+                $('#chronoExample .values').html(timer.getTimeValues().toString());
+            });  
+           setInterval(function() {
+            timer.start({countdown: true, startValues: {seconds: 60}});
+              $('.div-tabla').hide().fadeIn('slow'); 
+                  $.ajax({  
+                      
+                     type:"POST",
+                     url:"tableProgram.php",   
+                     data:{proceso:emlem_id},  
+                       
+                     success:function(data){ 
+                       
+                          //$('#update-form')[0].reset();  
+                          //$('.close2').click();  
+                          $('.div-tabla').html(data);
+                          $('.div-tabla').html(data).show().fadeIn(3000);    
+                     }  
+                });
+                }, 61000);
+
+        }
 
         $('#goto').keypress(function(e) {
     if(e.which == 13) {
@@ -445,6 +482,8 @@ $(".sort").each(function() {
         //alert('You pressed enter!');
     }
 });
+
+
                     </script>
 
 

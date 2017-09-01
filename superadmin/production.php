@@ -208,7 +208,7 @@ require('../saves/conexion.php');
     }
     .personal{
       width: 31%;
-    background-color: #333333;
+    background-color: #fff;
     height: 270px;
     display: inline-block;
     border-radius: 5px;
@@ -216,6 +216,7 @@ require('../saves/conexion.php');
     vertical-align: top;
     position: relative;
     font-family: "monse";
+        border: 1px solid #E6E8E7;
 
     }
     .personal:hover{
@@ -231,12 +232,12 @@ require('../saves/conexion.php');
       top: 10px;
       left: 10px;
       background-size: contain!important;
-      border: 1px solid #777878;
+      border: 1px solid #E6E8E7;
     }
     .ete-photo{
       height: 110px;
       width: 100%;
-      background: #212121;
+     background: #E0DDDD
       position: relative;
       border-top-left-radius:5px;
       border-top-right-radius:5px;
@@ -251,7 +252,7 @@ require('../saves/conexion.php');
       right: 18px;
       line-height: 90px;
       font-size: 50px;
-      color: #B7D8F3;
+      color: #545A8E;
       text-align: right;
     }
     .ete-stat{
@@ -263,7 +264,7 @@ require('../saves/conexion.php');
     }
     .ete-stat table{
       width: 100%;
-      color: #fff;
+      color: #00927B;
       font-size: 24px;
       
 
@@ -278,13 +279,13 @@ require('../saves/conexion.php');
     }
     .trh{
       height: 50px;
-      background:#393939;
-      border-bottom: 1px solid #444444;
-      border-top: 1px solid #444444;  
+      background:#F9F9F9;
+      border-bottom: 1px solid #E6E8E7;
+      border-top: 1px solid #E6E8E7;  
     }
     .middletd{
-      border-right: 1px dashed #444444;
-      border-left: 1px dashed #444444;
+      border-right: 1px dashed #E6E8E7;
+      border-left: 1px dashed #E6E8E7;
     }
     .trb{
       line-height: 24px;

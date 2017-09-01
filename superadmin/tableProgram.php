@@ -173,5 +173,14 @@ if ( $resultado) {
     else{
        printf("Errormessage: %s\n", $mysqli->error);
       }
-    }
+    }else{
       ?>
+      <br> 
+      <br>
+      <br>
+      <br>
+      <br>
+      <h1 style="text-align: center;font-size: 20px; color:#039E96">...</h1>
+<h1 style="text-align: center;font-size: 20px; color:#039E96">Selecciona un proceso para continuar</h1>
+
+      <?php } ?>   

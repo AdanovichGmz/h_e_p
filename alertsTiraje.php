@@ -1,7 +1,7 @@
 <?php
 
 
-switch ($_GET['mivariable']= $nommaquina){
+switch ($_SESSION['mac']){
     case 'corte':
     include("areas/maquinas/corte/ajustecorte.php");
     //header('Location: home.php');

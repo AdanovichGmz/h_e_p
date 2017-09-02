@@ -1,6 +1,6 @@
 /******************** index2.php ********************/
 
-$(document).ready(function() {
+$(document).ready(function(e) {
    // Esta primera parte crea un loader no es necesaria
     $().ajaxStart(function() {
         $('#loading').show();
@@ -21,7 +21,8 @@ $(document).ready(function() {
                 //$('#currentOrder').html('ORDEN ACTUAL: '+data);
                $('#tareas').html(data);
                var curorder= $('#returning').val();
-              
+               var curid= $('#returning2').val();
+              $('#order').val(curid);
                
                $('#currentOrder').html('ORDEN ACTUAL: orden '+curorder);
                 $('.saveloader').hide();
@@ -56,7 +57,20 @@ $(document).ready(function() {
         })        
         return false;
     }); 
-})
+/*
+    $( "#stop" ).click(function(e) {
+      var orderexist=$('#orderID').val();
+      if (orderexist!=='') {
+        $( "#nuevo_registro" ).submit();
+        e.preventDefault();
+
+      } else{
+        alert('Debes seleccionar una orden');
+      }
+                                        
+
+                                            }); */
+});
 
 function alerttime(){
   animacion = function(){
@@ -180,16 +194,7 @@ timer.addEventListener('started', function (e) {
     $('#chronoExample .values').html(timer.getTimeValues().toString());
 });
      
-     $( "#stop" ).click(function() {
-      var orderexist=$('#orderID').val();
-      if (orderexist!=='') {
-        $( "#nuevo_registro" ).submit();
-      } else{
-        alert('Debes seleccionar una orden');
-      }
-                                        
-
-                                            });
+     
 
    $('.goeat').click(function () {
     timerEat.start();
@@ -264,7 +269,7 @@ timer.addEventListener('started', function (e) {
 
             }
         })        
-        return false;
+        
     }); 
 })
 
@@ -272,5 +277,25 @@ timer.addEventListener('started', function (e) {
            setTimeout('document.fo3.reset()',2);
       return false;
 }
+ 
+
+ function saveAjuste(){
+  var mac=$('#mac').val();
+    var order=$('#order').val();
+     $.ajax({  
+                      
+                     type:"POST",
+                     url:"saves.php",   
+                     data:$('#nuevo_registro').serialize(),  
+                       
+                     success:function(data){ 
+                       
+                          //$('#update-form')[0].reset();  
+                          //$('.close').click(); 
+                          window.location.replace("index3.php?mac="+mac+"&order="+order);
+                          console.log(data);
+                     }  
+                });
+ }
 
 

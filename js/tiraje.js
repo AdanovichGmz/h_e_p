@@ -43,11 +43,7 @@
 
   }
 
-                           $( "#savealerta").click(function() {
-                                             
-                                                      $( "#fo3" ).submit(); 
-                                                      
-                                            });
+                        
 var timer = new Timer();
  var timerEat = new Timer();
  var timerAlertm = new Timer();
@@ -194,4 +190,51 @@ $('.radio-menu').click(function() {
                       $('.face-osc').removeClass('face-osc');
                       $(this).addClass('face-osc').find('input').prop('checked', true)    
                     });
-                           
+ function saveAlert(){
+         event.preventDefault();
+         //var mac=$('#mac').val();
+         timerAlertm.pause();
+    $('#timealerta').val(timerAlertm.getTimeValues().toString());
+    console.log(timerAlertm.getTimeValues().toString());
+    timerAlertm.stop();
+         $.ajax({  
+                      
+                     type:"POST",
+                     url:"savealertamaquina.php",   
+                     data:$('#alerta-tiro').serialize(),  
+                       
+                     success:function(data){ 
+                        
+                        $('.saveloader').hide();
+                        $('.savesucces').show();
+                        setTimeout(function() {   
+                   close_box();
+                }, 600);
+                          //$('#update-form')[0].reset();  
+                          //$('.close').click(); 
+                          //window.location.replace("index2.php?mac="+mac);
+                          console.log(data);
+                     }  
+                });
+    } 
+ function saveTiro(){
+         event.preventDefault();
+         var id=$('#numodt').val();
+          var odt=$('#odt').val();
+          var qty=$('#qty').val();
+         $.ajax({  
+                      
+                     type:"POST",
+                     url:"saves.php",   
+                     data:$('#fvalida').serialize(),  
+                       
+                     success:function(data){ 
+                        
+                       
+                          //$('#update-form')[0].reset();  
+                          //$('.close').click(); 
+                          window.location.replace("encuesta.php?order="+id+"&odt="+odt+"&qty="+qty);
+                          console.log(data);
+                     }  
+                });
+    } 

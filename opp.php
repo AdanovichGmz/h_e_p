@@ -165,6 +165,7 @@ $i5++;
                 
                   <input type="hidden" name="machine" value="<?=$maqID; ?>">
                  <input type='hidden' id='returning' name="returning" value="<?=implode(",", $odetes); ?>">
+                 <input type='hidden' id='returning2' name="returning2" value="<?=implode(",", $datos); ?>">
                   <?php
                       $query = $mysqli->query("SELECT o.*,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display, (SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$maqID'  HAVING status IS NOT NULL order by orden_display asc LIMIT 12");
                       

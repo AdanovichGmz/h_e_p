@@ -19,107 +19,59 @@ if (@$_SESSION['logged_in'] != true) {
         self.location.replace("index.php");
     </script>';
 } else {
-    
-    if (!empty($_POST)) {
-        
-        
-        $tiempo      = $_POST['tiempo'];
-        $nommaquina  = $_POST['nommaquina'];
-        $logged_in   = $_POST['logged_in'];
-        $horadeldia  = $_POST['horadeldia'];
-        $fechadeldia = $_POST['fechadeldia'];
-        
+    //echo $_SESSION['machineName'];
 
-        $pause_exist = false;
-        $query2      = "SELECT id FROM login WHERE logged_in='$logged_in'";
-        $query4      = "SELECT * FROM maquina WHERE mac='$nommaquina'";
-        $getID       = mysqli_fetch_assoc($mysqli->query($query2));
-        $userID      = $getID['id'];
-        $getMachine  = mysqli_fetch_assoc($mysqli->query($query4));
-        $machineID   = $getMachine['idmaquina'];
-        $machineName = $getMachine['nommaquina'];
-        //$odetes= explode(',',$_POST['orderodts']);
-         $actuals_query="SELECT  os.status, o.idorden,o.numodt, os.proceso_actual FROM orden_estatus os INNER JOIN ordenes o on os.id_orden=o.idorden WHERE status='actual' AND proceso_actual='$machineName'";
-        $resultodt=$mysqli->query($actuals_query);
-        //$numodt      = (isset($_POST['numodt'])) ? explode(',', substr($_POST['numodt'], 0, -1)) : '';
-        while($arr=mysqli_fetch_assoc($resultodt)){
-          $numodt[] = $arr['idorden'];
-          $odt[]=$arr['numodt'];
-        }
-        $odetes=implode(",", $odt);
-        foreach ($numodt as $odt) {
-            
-            $query     = "INSERT INTO tiraje (tiempo_ajuste, id_maquina, id_user, horadeldia_ajuste, fechadeldia_ajuste, id_orden) VALUES ('$tiempo','$machineID','$userID','$horadeldia','$fechadeldia', $odt)";
-            $resultado = $mysqli->query($query);
-        }
-        if ($resultado) {
-        } else {
-            printf($mysqli->error);
-        }
-        
-    } else {
-        
-        $ip  = getenv("REMOTE_ADDR");
-        $cmd = "arp  $ip | grep $ip | awk '{ print $3 }'"; ?>
-        <div style="display: none;">
-        <?php $recoverMac         =system($cmd); // '5c:f5:da:2f:33:5e'; ?>
-        </div>
-        <?php
-        //$recoverMac         = $_SESSION['nommaquina'];
-        $nommaquina         = $recoverMac;
-        $queryRec           = "SELECT * FROM maquina WHERE mac='$recoverMac'";
-        $recoverMachine     = mysqli_fetch_assoc($mysqli->query($queryRec));
-        $mrecovered         = $recoverMachine['nommaquina'];
-        $mrecoveredId       = $recoverMachine['idmaquina'];
-        $logged_in          = $_SESSION['logged_in'];
-        $pause_exist        = false;
-        $recoverOrdenPaused = "SELECT *,TIME_TO_SEC(tiempo_pausa) AS seconds FROM procesos WHERE  nombre_proceso='$mrecovered' AND avance='en pausa'";
-        $recoverOrden       = "SELECT *,TIME_TO_SEC(tiempo_pausa) AS seconds FROM procesos WHERE  nombre_proceso='$mrecovered' AND avance='retomado'";
-        $recov              = $mysqli->query($recoverOrdenPaused);
-        if ($recov->num_rows > 0) {
+    $mac=(isset($_SESSION['mac']))?$_SESSION['mac'] : system($cmd) ;
+
+    $machineName=$_SESSION['machineName'];
+    $machineID = $_SESSION['machineID'];
+    $pause_exist = false;
+    $getPaused = "SELECT *,TIME_TO_SEC(tiempo_pausa) AS seconds FROM procesos WHERE  nombre_proceso='$machineName' AND avance='en pausa'";
+    $getretaking       = "SELECT *,TIME_TO_SEC(tiempo_pausa) AS seconds FROM procesos WHERE  nombre_proceso='$machineName' AND avance='retomado'";
+
+    $paused = $mysqli->query($getPaused);
+    $retaking       = $mysqli->query($getretaking);
+        if ($paused->num_rows > 0) {
             $pause_exist    = true;
-            $queryus        = "SELECT id FROM login WHERE logged_in='$logged_in'";
-            $getusID        = mysqli_fetch_assoc($mysqli->query($queryus));
-            $usID           = $getusID['id'];
-            $recoOrden      = mysqli_fetch_assoc($recov);
-            $stoppedOrder   = $recoOrden['numodt'];
-            $stoppedOrderID = $recoOrden['id_orden'];
-            $secondspaused  = $recoOrden['seconds'];
-            $fecha_pausa    = $recoOrden['fecha_pausa'];
+           
+            $usID           = $_SESSION['id'];
+            $recoOrden      = mysqli_fetch_assoc($paused);
+            $OrderODT   = $recoOrden['numodt'];
+            $orderID[] = $recoOrden['id_orden'];
+            //$secondspaused  = $recoOrden['seconds'];
+            //$fecha_pausa    = $recoOrden['fecha_pausa'];
             $horaAjuste     = date(" H:i:s", time());
-            $newtiraje      = "INSERT INTO tiraje(id_maquina,id_orden,id_user,horadeldia_ajuste) VALUES ($mrecoveredId,$stoppedOrderID, $usID,'$horaAjuste')";
+            $newtiraje      = "INSERT INTO tiraje(id_maquina,id_orden,id_user,horadeldia_ajuste) VALUES ($machineID,$OrderID, $usID,'$horaAjuste')";
             $inserting      = $mysqli->query($newtiraje);
             if (!$inserting) {
                 echo $newtiraje . "<br>";
                 printf($mysqli->error);
             }
-        } else {
+        } elseif ($retaking->num_rows > 0)  {
             
-            $recov          = $mysqli->query($recoverOrden);
-            $secondspaused  = 'false';
-            $recoOrden      = mysqli_fetch_assoc($recov);
-            $stoppedOrder   = $recoOrden['numodt'];
-            $stoppedOrderID = $recoOrden['id_orden'];
-            $recoverTiro    = "SELECT * FROM tiraje WHERE id_orden=$stoppedOrderID ORDER BY idtiraje DESC";
-            $recoTiro       = mysqli_fetch_assoc($mysqli->query($recoverTiro));
-            $horaAjuste     = $recoTiro['horadeldia_ajuste'];
+            //$secondspaused  = 'false';
+            $recoOrden      = mysqli_fetch_assoc($retaking);
+            $OrderODT   = $recoOrden['numodt'];
+            $orderID[] = $recoOrden['id_orden'];
+            $singleID=$recoOrden['id_orden'];
+            $getretakingTiro    = "SELECT * FROM tiraje WHERE id_orden=$singleID ORDER BY idtiraje DESC";
+            $retakingTiro       = mysqli_fetch_assoc($mysqli->query($getretakingTiro));
+            $horaAjuste     = $retakingTiro['horadeldia_ajuste'];
+        }else{
+
+            $orderID[] = $_GET['order'];
+            $singleID=$_GET['order'];
+            $userID      = $_SESSION['id'];
+            $getAjuste    = "SELECT horadeldia_ajuste FROM tiraje WHERE id_orden=$singleID AND id_maquina=$machineID";
+            $Ajuste       = mysqli_fetch_assoc($mysqli->query($getAjuste));
+            $horaAjuste     = $Ajuste['horadeldia_ajuste'];
+
         }
-        
-        
-        $numodt[] = $stoppedOrderID;
-        
-        $query2      = "SELECT id FROM login WHERE logged_in='$logged_in'";
-        $query4      = "SELECT * FROM maquina WHERE mac='$recoverMac'";
-        $getID       = mysqli_fetch_assoc($mysqli->query($query2));
-        $userID      = $getID['id'];
-        $getMachine  = mysqli_fetch_assoc($mysqli->query($query4));
-        $machineID   = $getMachine['idmaquina'];
-        $machineName = $getMachine['nommaquina'];
-        
-    }
+
+
     
     
-    $_GET['mivariable'] = $nommaquina;
+    $_GET['mivariable'] = $machineName;
     $query0             = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$machineName' HAVING status='actual'";
     
     $resultado0 = $mysqli->query($query0);
@@ -157,17 +109,21 @@ if (@$_SESSION['logged_in'] != true) {
 
     <?php
     $today     = date("d-m-Y");
+    //obtenemos el tiempo real sumando tiempoTiraje + tiempo_ajuste +tiempoalertamaquina + tiempoajuste
     $etequery1 = "SELECT COALESCE((SELECT  IFNULL(SUM( TIME_TO_SEC( tiempoTiraje) ),0)  FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')+(SELECT  IFNULL(SUM( TIME_TO_SEC( tiempo_ajuste)),0) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_ajuste = '$today')+(SELECT  IFNULL(SUM( TIME_TO_SEC( tiempoalertamaquina) ),0)  FROM alertamaquinaoperacion WHERE id_maquina=$machineID AND fechadeldiaam = '$today') + (SELECT  IFNULL(SUM( TIME_TO_SEC(tiempoalertamaquina) ),0) FROM alertageneralajuste WHERE id_maquina=$machineID AND fechadeldiaam = '$today')) as tiempo_real";
+    //obtenemos el tiempo muerto sumando las idas al sanitario
     $etequery2 = "SELECT  IFNULL(SUM( TIME_TO_SEC( breaktime) ),0) AS tiempo_muerto  FROM breaktime WHERE id_maquina=$machineID AND radios='Sanitario' AND fechadeldiaam = '$today'";
+    //obtenemos la calidad a la primera operando entregados-defectos*100/cantidadpedida  
     $etequery3 = "SELECT COALESCE(((SELECT SUM( entregados ) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')-(SELECT SUM( defectos ) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today'))*100/ (SELECT SUM( cantidad ) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')) as calidad_primera";
-    
+    //obtenemos desempeño operando entregados+merma
     $etequery4 = "SELECT COALESCE(((SELECT SUM(entregados) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')+(SELECT SUM(merma) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_ajuste = '$today'))) as desempenio";
     
-    
+    //obtenemos el elemento o producto
     $getelement = mysqli_fetch_assoc($resultado02_5);
     $element    = $getelement['producto'];
     $begin      = new DateTime('09:00');
     $current    = new DateTime(date('H:i'));
+    //obtenemos el tiempo transcurrido desde el inicio del dia hasta el momento actual
     $interval   = $begin->diff($current);
     //echo $interval->format("%H:%I");
     $time_diff  = $interval->format("%H:%I:%S");
@@ -178,8 +134,9 @@ if (@$_SESSION['logged_in'] != true) {
             break;
         $seconds += pow(60, $key) * $value;
     }
-    
+    //obtenemos el estandar de piezas por hora para el elemento y proceso actual
     $standar_query2 = "SELECT * FROM estandares WHERE id_maquina=$machineID AND id_elemento= $element";
+    
     $getstandar     = mysqli_fetch_assoc($mysqli->query($standar_query2));
     $estandar       = $getstandar['piezas_por_hora'];
     
@@ -194,6 +151,7 @@ if (@$_SESSION['logged_in'] != true) {
     $Quality    = $getQuality['calidad_primera'];
     
     $getEfec       = mysqli_fetch_assoc($mysqli->query($etequery4));
+    //obtenemos el porcentaje de estandar segundos*estandar/1hora
     $estandar_prod = ($seconds * $estandar) / 3600;
     
     $desempenio = $getEfec['desempenio'] / $estandar_prod;
@@ -490,7 +448,7 @@ if (@$_SESSION['logged_in'] != true) {
   </tr>
   <tr>
     
-    <td class="orders-td"> <?php if (count($numodt) > 1) {
+    <td class="orders-td"> <?php if (count($orderID) > 1) {
         echo $odetes;
    
      } else{
@@ -591,7 +549,8 @@ if (@$_SESSION['logged_in'] != true) {
 </div>
   </div>
 </div>
- <form name="fvalida" id="fvalida" method="POST" action="index4.php" onsubmit="">
+ <form name="fvalida" id="fvalida" method="POST" onsubmit="saveTiro()">
+  <input type="hidden" name="section" value="tiraje">
  <input type="hidden" name="hour" value="<?= (isset($_POST['horadeldia'])) ? $_POST['horadeldia'] : $horaAjuste; ?>"> 
 <div class="statistics">
   <div class="left-sec" style="position: relative;">
@@ -607,7 +566,7 @@ if (@$_SESSION['logged_in'] != true) {
 ?>
   <?php
     
-    if (count($numodt)== 1) {
+    if (count($orderID)== 1) {
 ?>
           <div id="cantpedido">
             <div> CANTIDAD DE PEDIDO</div>
@@ -622,7 +581,7 @@ if (@$_SESSION['logged_in'] != true) {
                         <div class="square-button-h green stop eatpanel goeat">
                           <img src="images/dinner2.png">
                         </div>
-                        <?php if (count($numodt)== 1) { ?>
+                        <?php if (count($orderID)== 1) { ?>
                         <div class="square-button-h blue " id="saving">
                           <img src="images/saving.png">
                         </div>
@@ -641,7 +600,7 @@ if (@$_SESSION['logged_in'] != true) {
 
   <?php
     
-    if (count($numodt) > 1) {
+    if (count($orderID) > 1) {
 ?>
    <div class="diferentbutton" onclick="multiOrders()">
        <div ><img src="images/insert.png"></div><div><p>INGRESAR DATOS</p></div>
@@ -653,7 +612,7 @@ if (@$_SESSION['logged_in'] != true) {
  <div class="close" onclick="close_box()">x</div>
   <div style="width: 100%; height: 420px;overflow-y: scroll; ">
   <?php
-foreach ($numodt as $odt) {
+foreach ($orderID as $odt) {
     $data_query = "SELECT * FROM ordenes WHERE idorden=$odt";
     $result     = $mysqli->query($data_query);
     while ($row = mysqli_fetch_object($result)) {
@@ -692,8 +651,8 @@ foreach ($numodt as $odt) {
     </div>
   </div>
   <!-- ********************** Termina Ventana multiples ordenes seleccionadas ******************** -->
- <input type="hidden"  name="numodt" value="<?= implode(",", $numodt) ?>"/>
- <input  type="hidden" name="qty" value="multi" />
+ <input type="hidden"  name="numodt" value="<?= implode(",", $orderID) ?>"/>
+ <input  type="hidden" id="qty" name="qty" value="multi" />
 <input  type="hidden" name="odt" value="<?=$odetes ?>" />
   <?php
     } else {
@@ -703,7 +662,7 @@ foreach ($numodt as $odt) {
         if ($pause_exist != true) {
 ?>
      <table id="former">
-  <input  type="hidden" name="qty" value="single" />
+  <input  type="hidden" id="qty" name="qty" value="single" />
   <tr>
     <td class="title-form">CANTIDAD RECIBIDA</td>
     <td class="title-form">BUENOS</td>
@@ -799,7 +758,7 @@ foreach ($numodt as $odt) {
 ?>
                                                          
                             <input hidden id="producto" name="producto" class=" diseños" value="<?= $row->producto ?>"/>
-                             <input hidden id="numodt" name="numodt" class="diseños" value="<?= implode(",", $numodt) ?>"/>
+                             <input hidden id="numodt" name="numodt" class="diseños" value="<?= implode(",", $orderID) ?>"/>
                              <input hidden id="odt" name="odt" class=" diseños" value="<?= $row->numodt ?>"/>
                       <input hidden id="numproceso"  class=" diseños" value="<?= $row->proceso ?>"/>
                              <?php
@@ -856,7 +815,7 @@ foreach ($numodt as $odt) {
       <div class="container">
           
             <div id="estilo">
-             <form id="fo3" name="fo3" action="savealertamaquina.php" method="post" class="form-horizontal"  >
+             <form id="alerta-tiro" name="alerta-tiro" method="post"  class="form-horizontal"  >
                 
                 <input hidden type="text"  name="logged_in" id="logged_in" value="<?php
     echo "" . $_SESSION['logged_in'];
@@ -896,7 +855,7 @@ foreach ($numodt as $odt) {
                         <div class="square-button-small red derecha stopalert start reset">
                           <img src="images/ex.png">
                         </div>
-                        <div id="savealerta" class="square-button-small derecha blue " onclick="showLoad();">
+                        <div id="savealerta" class="square-button-small derecha blue " onclick="showLoad(); saveAlert();">
                           <img src="images/saving.png">
                         </div>
                         
@@ -1035,7 +994,7 @@ foreach ($numodt as $odt) {
                          
                           else{
                            <?php
-    if (count($numodt) > 1) {
+    if (count($orderID) > 1) {
 ?>
                             $( "#formbutton" ).click();
                              showLoad();

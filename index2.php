@@ -18,224 +18,62 @@ date_default_timezone_set("America/Mexico_City");
     }        
 require('saves/conexion.php');
 
+
 //cuando cierran sesion
 $ip=getenv("REMOTE_ADDR"); 
 $cmd = "arp  $ip | grep $ip | awk '{ print $3 }'"; 
 $recoverSession=(!empty($_POST))? 'false' : 'true' ;
 
-if (empty($_POST)) {
-  //$recoverMac='5c:f5:da:2f:33:5e';
-  $recoverMac=system($cmd);
-$queryRec="SELECT * FROM maquina WHERE mac='$recoverMac'";
-$recoverMachine = mysqli_fetch_assoc($mysqli->query($queryRec));
-$mrecovered = $recoverMachine['nommaquina'];
-$machineName=$recoverMachine['nommaquina'];
-$mrecoveredId = $recoverMachine['idmaquina'];
-$machineID=$mrecoveredId;
-$recoverOrdenPaused="SELECT *,TIME_TO_SEC(tiempo_pausa) AS seconds FROM procesos WHERE  nombre_proceso='$mrecovered' AND avance='en pausa'";
-  $recoverOrden="SELECT *,TIME_TO_SEC(tiempo_pausa) AS seconds FROM procesos WHERE  nombre_proceso='$mrecovered' AND avance='retomado'";
-   $recov=$mysqli->query($recoverOrdenPaused);
-  if ($recov->num_rows>0) {
-     $recoOrden = mysqli_fetch_assoc($recov);
-    $stoppedOrder = $recoOrden['numodt'];
-$stoppedOrderID = $recoOrden['id_orden'];
-header('Location:http:'.dirname($_SERVER['PHP_SELF']).'/index3.php');
-  }else{
-  $recov=$mysqli->query($recoverOrden);
-  
-    $recoOrden = mysqli_fetch_assoc($recov);
-    $stoppedOrder = $recoOrden['numodt'];
-    $stoppedOrderID = $recoOrden['id_orden'];
-  }
-  
+$mac=(isset($_SESSION['mac']))?$_SESSION['mac'] : system($cmd) ;
 
-// termina cuando cierran sesion
-}
+$machineName=$_SESSION['machineName'];
+$machineID = $_SESSION['machineID'];
 
-if (!empty($_POST)) {
- $cycle=$_POST['ciclo'];
-if ($cycle=='start') {
+if (isset($_GET['order'])) {
+  $currentOrder=$_GET['order'];
 
-
- 
-$tiempo=$_POST['tiempo'];
-$mac=$_POST['mac'];
-$logged_in=$_POST['logged_in'];
-$horadeldia=$_POST['horadeldia'];
-$fechadeldia=$_POST['fechadeldia'];
-$query2="SELECT id FROM login WHERE logged_in='$logged_in'";
-$query4="SELECT * FROM maquina WHERE mac='$mac'";
-//$extract_user=$mysqli->query($query2);
-//$userId=mysql_fetch_assoc($extract_user);
-$getID = mysqli_fetch_assoc($mysqli->query($query2));
-$userID = $getID['id'];
-$getMachine = mysqli_fetch_assoc($mysqli->query($query4));
-$machineID = $getMachine['idmaquina'];
-$machineName = $getMachine['nommaquina'];
-//verificar si hay una orden en pausa 
-$orderPaused="SELECT *,TIME_TO_SEC(tiempo_pausa) AS seconds FROM procesos WHERE  nombre_proceso='$machineName' AND avance='en pausa'";
-  $recov=$mysqli->query($orderPaused); 
-  if ($recov->num_rows==0) {
-
-$queryOrden="SELECT o.*,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$machineName' HAVING status='actual'";
-$asoc=$mysqli->query($queryOrden);
-
-while($get_Act=mysqli_fetch_assoc($asoc)){
- 
-  $getActODT[] = $get_Act['numodt'];
-  $ordenActual[] = $get_Act['idorden'];
-  
-}
-
-
-$query="INSERT INTO asaichi (tiempo, id_maquina, id_usuario, horadeldia, fechadeldia) VALUES ('$tiempo','$machineID',$userID,'$horadeldia','$fechadeldia')";
-$resultado=$mysqli->query($query);
-//$query3="UPDATE login SET nommaquina= ('$nommaquina') WHERE logged_in= '$logged_in'";
-//$query3="SELECT nommaquina FROM ajuste WHERE logged_in= '$logged_in'";
-}
-else{
-  header('Location:http:'.dirname($_SERVER['PHP_SELF']).'/index3.php');
-}
-
-}
-elseif ($cycle=='restart') {
-  
-$nombremaquina=$_POST['nombremaquina'];
-$lastOrder=$_POST['idorden'];
-$logged_in=$_POST['logged_in'];
-$horadeldia=$_POST['horadeldia'];
-$fechadeldia=$_POST['fechadeldia'];
-$desempeno=$_POST['desempeno'];
-$problema= (isset($_POST['problema'])) ?$_POST['problema'] : '';
-$calidad=$_POST['calidad'];
-$problema2=(isset($_POST['problema2'])) ?$_POST['problema2'] : '';
-$odt=$_POST['odt'];
-$observaciones=$_POST['observaciones'];
-$mac=$_POST['nombremaquina'];
-
-$query2="SELECT id FROM login WHERE logged_in='$logged_in'";
-$query4="SELECT * FROM maquina WHERE mac='$nombremaquina'";
-$getID = mysqli_fetch_assoc($mysqli->query($query2));
-$userID = $getID['id'];
-$getMachine = mysqli_fetch_assoc($mysqli->query($query4));
-$machineID = $getMachine['idmaquina'];
-$machineName = $getMachine['nommaquina'];
-
-$query="INSERT INTO encuesta (id_usuario, id_maquina, horadeldia, fechadeldia, desempeno, problema, calidad, problema2, observaciones) VALUES ('$userID','$machineID','$horadeldia','$fechadeldia','$desempeno','$problema','$calidad','$problema2','$observaciones')";
-
-
-$resultado=$mysqli->query($query);
-
-
-if ( $resultado) {
-  function is_in_array($needle, $haystack) {
-    foreach ($needle as $stack) {if (in_array($stack, $haystack)) { return true;} }
-    return false;
-}
-  if ($_POST['qty']='multi') {
-    $arr_odetes=explode(',', $odt);
-    foreach (explode(',',$lastOrder) as $key => $order) {
-      $arr_odt=$arr_odetes[$key];
-  $queryavance="UPDATE procesos SET estatus=1, avance=4 WHERE id_orden=$order AND nombre_proceso='$machineName'";
-$mysqli->query($queryavance);
-$query_deliv="SELECT avance FROM procesos WHERE numodt='$arr_odt' AND id_orden=$order ";
-
-$deliv=$mysqli->query($query_deliv);
-while($arrd=mysqli_fetch_array($deliv)) { $deliver[] = $arrd['avance']; }
-$b = array('inicio','en pausa','retomado');
-
-$is_complete=is_in_array($b, $deliver);
-if ($is_complete==false) {
-  $querydeliv="UPDATE ordenes SET entregado='true' WHERE idorden=$lastOrder";
-$mysqli->query($querydeliv);
-}
-}
-$queryOrden="SELECT o.*,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$machineName' HAVING status='actual'";
-$asoc=($mysqli->query($queryOrden));
-while($getAct=mysqli_fetch_assoc($asoc)){
-  $getActODT[] = $getAct['numodt'];
-  $ordenActual[] = $getAct['idorden'];
-  
-}
-if( !session_id() ){ session_start(); }
-if(@$_SESSION['logged_in'] != true){
-    echo '
-    <script>
-        alert("tu no estas autorizado para entrar a esta pagina");
-        self.location.replace("index.php");
-    </script>';
-}
-
-}
-else{
-$queryavance="UPDATE procesos SET estatus=1, avance=4 WHERE id_orden=$lastOrder AND nombre_proceso='$machineName'";
-$mysqli->query($queryavance);
-
-$query_deliv="SELECT avance FROM procesos WHERE numodt='$odt' AND id_orden=$lastOrder ";
-$deliv=$mysqli->query($query_deliv);
-
-
-
-while($arrd=mysqli_fetch_array($deliv)) {
-  $deliver[] = $arrd['avance'];
-  
-}
-
-$b = array('inicio','en pausa','retomado');
-function is_in_array($needle, $haystack) {
-
-    foreach ($needle as $stack) {
-
-        if (in_array($stack, $haystack)) {
-             return true;
-        }
-    }
-
-    return false;
-}
-
-$is_complete=is_in_array($b, $deliver);
-
-if ($is_complete==false) {
-  $querydeliv="UPDATE ordenes SET entregado='true' WHERE idorden=$lastOrder";
-$mysqli->query($querydeliv);
-}
-
-
-$queryOrden="SELECT o.*,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$machineName' HAVING status='actual'";
-$asoc=($mysqli->query($queryOrden));
-//$ordenActual = $getAct['numodt'];
-
-while($getAct=mysqli_fetch_assoc($asoc)){
-  $getActODT[] = $getAct['numodt'];
-  $ordenActual[] = $getAct['idorden'];
-  
-}
-
-if( !session_id() )
-{
-    session_start();
-    
-
-}
-if(@$_SESSION['logged_in'] != true){
-    echo '
-    <script>
-        alert("tu no estas autorizado para entrar a esta pagina");
-        self.location.replace("index.php");
-    </script>';
 }else{
-//echo $_SERVER['HTTP_HOST'];
-//header("Location: http://{$_SERVER['SERVER_NAME']}/unify/index2.php");
+  
+  $pausedOrder=$mysqli->query("SELECT *,TIME_TO_SEC(tiempo_pausa) AS seconds FROM procesos WHERE  nombre_proceso='$machineName' AND avance='en pausa'");
+  //verificar si hay una orden en pausa 
+  if ($pausedOrder->num_rows>0) {
+     $getOrder = mysqli_fetch_assoc($pausedOrder);
+    $getActODT[] = $getOrder['numodt'];
+    $ordenActual[] = $getOrder['id_orden'];
+    header('Location:http:'.dirname($_SERVER['PHP_SELF']).'/index3.php');
+    echo "<script>console.log('orden pausa');</script>";
+
+  }else{
+
+  $retaking=$mysqli->query("SELECT *,TIME_TO_SEC(tiempo_pausa) AS seconds FROM procesos WHERE  nombre_proceso='$machineName' AND avance='retomado'");
+    
+    if ($retaking->num_rows>0) {
+      $getOrder = mysqli_fetch_assoc($retaking);
+    $getActODT[] = $getOrder['numodt'];
+    $ordenActual[] = $getOrder['id_orden'];
+    echo "<script>console.log('orden retomada');</script>";
+
+
+    } else{
+
+      $queryOrden="SELECT o.*,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$machineName' HAVING status='actual'";
+      $asoc=$mysqli->query($queryOrden);
+     
+      while($get_Act=mysqli_fetch_assoc($asoc)){
+       
+        $getActODT[] = $get_Act['numodt'];
+        $ordenActual[] = $get_Act['idorden'];
+  
+}
+    echo "<script>console.log('orden normal');</script>";
+
+
+    }
+  }
 }
 
-}
 
- }else{
-            printf("Errormessage: %s\n", $mysqli->error);
-          }
-}
-}
+
 
 $p=1;
 if ( $p==1) {
@@ -248,142 +86,15 @@ if ( $p==1) {
 <?php include 'head.php'; ?>
 <body onload="setTimeout('alerttime()',2000000);">
 <div id="formulario"></div>
-    <style type="text/css">
-       .clock{
-        transform: scale(1.5);
--ms-transform: scale(1.5); 
--webkit-transform: scale(1.5); 
--o-transform: scale(1.5);
--moz-transform: scale(1.5);
-      }  
-
-#load{
-  width: 100%; text-align: center; 
-}
-
-         .congral2{
-            width: 100%;
-            height: 100%;
-
-        }
- .cont2{
-           
-          
-            
-        }
-
-        #result {
-  width:280px;
-  padding:10px;
-  border:1px solid #bfcddb;
-  margin:auto;
-  margin-top:10px;
-  text-align:center;
-}
-
- #success-msj{
-    color: #BB1B1B!important;
-    font-family: "monse-medium"!important;
-
-}   
-.backdrop
-    {
-      position:absolute;
-      top:0px;
-      left:0px;
-      width:100%;
-      height:100%;
-      background:#000;
-      opacity: .0;
-      filter:alpha(opacity=0);
-      z-index:50;
-      display:none;
-    }
- 
- 
-    .box
-    {
-      position:absolute;
-      top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      width:150px;
-      height: 150px;
-      
-      background:#ffffff;
-      z-index:51;
-      padding:10px;
-      -webkit-border-radius: 5px;
-      -moz-border-radius: 5px;
-      border-radius: 5px;
-      -moz-box-shadow:0px 0px 5px #444444;
-      -webkit-box-shadow:0px 0px 5px #444444;
-      box-shadow:0px 0px 5px #444444;
-      display:none;
-    }
- 
-    .close
-    {
-      float:right;
-      margin-right:6px;
-      cursor:pointer;
-    }
-    .saveloader{
-      width: 100%;
-      text-align: center;
-      position: relative;
-    }
-    .saveloader img{
-      width: 100%;
-    }
-    .saveloader p{
-     margin-top: -20px;
-    }
-     .savesucces{
-      width: 100%;
-      text-align: center;
-      position: relative;
-    }
-    .savesucces img{
-      width: 60%;
-      margin-top: 10px;
-      margin-bottom: 20px;
-    }
-    .savesucces p{
-     
-    }    
-@media only screen and (min-width:481px) and (max-width:768px) and (orientation: portrait) {
-    .contegral{
-        display:none;
-    }
-        body {
-             background-image:none;
-        }
-    .msj {
-    display:block;
-    width: 100%;
-    height: 100%;
-    background-repeat: no-repeat;
-    top: 40%;
-    left: 10%;
-    position: absolute;
-    z-index:122;
-    }
-}
-
-@media screen and (min-device-width:768px) and (max-device-width:1024px) and (orientation: landscape) {
- .msj {
- display: none;
- }
-}
-    </style>
+    <input type="hidden" id="mac" value="<?=$mac ?>">
+    <input type="hidden" id="order" value="<?= (isset($ordenActual))? implode(",", $ordenActual)  : ((isset($stoppedOrderID))? $stoppedOrderID : '') ;?>">
     <div class="msj">
         <img src="images/msj.fw.png" />
     </div>
          <div class="congral2">               
             <div class="cont2 center-block">
-                <form name="nuevo_registro" id="nuevo_registro" method="POST" action="index3.php" >
-                
+                <form name="nuevo_registro" id="nuevo_registro" method="POST">
+                  <input type="hidden" name="section" value="ajuste">
                  <input hidden type="text" name="logged_in" id="logged_in" value="<?php echo "". $_SESSION['logged_in'] ?>" />
                 <input type="hidden" id="orderID" name="numodt" class=" diseños" value="<?= (isset($ordenActual))? implode(",", $ordenActual)  : ((isset($stoppedOrderID))? $stoppedOrderID : '') ;?>"/>
                 <input type="hidden" id="orderODT" name="orderodts" class=" diseños" value="<?= (isset($getActODT))? implode(",", $getActODT)  : '' ;?>"/>
@@ -411,7 +122,7 @@ if ( $p==1) {
                         <div class="square-button green stop eatpanel goeat">
                           <img src="images/dinner2.png">
                         </div>
-                        <div id="stop" class="square-button blue " >
+                        <div id="stop" class="square-button blue " onclick="saveAjuste()" >
                           <img src="images/saving.png">
                         </div>
                         <div class="square-button yellow   derecha goalert">

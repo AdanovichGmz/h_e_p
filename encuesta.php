@@ -145,20 +145,21 @@
 
     <div class="congral">               
         <div class="cont center-block">
-                       <form id="encuesta-form" class="form-horizontal" action="index2.php" method="post">
+                       <form id="encuesta-form" class="form-horizontal" onsubmit="saveEncuesta()" method="post">
+                       <input type="hidden" name="section" value="encuesta">
                            <input hidden type="text" name="logged_in" id="logged_in" value="<?php echo "". $_SESSION['logged_in'] ?>" />
                            
                            <input hidden type="text" name="ciclo" value="restart"  />
-                           <?php if ($_POST['qty']=='single') { ?>
-                           <?php $valorQuePasa3 = $_GET['mivariable']; ?> 
-                            <input hidden type="text" name="odt" value="<?=$odt ?>"  />
-                            <input hidden type="text" name="idorden" value="<?=$numodt; ?>"  />
+                           <?php if ($_GET['qty']=='single') { ?>
+                          
+                           <input hidden type="text" name="odt" value="<?=$_GET['odt'] ?>"  />
+                            <input hidden type="text" name="idorden" value="<?=$_GET['order'] ?>"  />
                             <input hidden type="text" name="qty" value="single"  />
-                            <input hidden type="text" name="nombremaquina" id="nombremaquina"  value="<?php echo $valorQuePasa3; ?>"  /> 
+                           
                            <?php }else{ ?>
-                      <input hidden type="text" name="odt" value="<?=$odt ?>"  />
-                      <input hidden type="text" name="idorden" value="<?=$numodt; ?>"  />
-                      <input hidden type="text" name="nombremaquina" id="nombremaquina"  value="<?=$mac_maquina; ?>"  /> 
+                      <input hidden type="text" name="odt" value="<?=$_GET['odt'] ?>"  />
+                      <input hidden type="text" name="idorden" value="<?=$_GET['order']; ?>"  />
+                      
                       <input hidden type="text" name="qty" value="multi"  />
                            <?php } ?>
                           
@@ -182,7 +183,7 @@
                           NO
                         </div>
                         
-
+                        <input type="submit" style="display: none;" id="send-encuesta">
                           
                 </div>
                 </div>
@@ -453,7 +454,7 @@
 
 
                           $( "#submit-form" ).click(function() {
-                                              $( "#encuesta-form" ).submit();
+                                              $( "#send-encuesta" ).click();
                                             });
 
                                     </script>
@@ -473,6 +474,27 @@ $(".next").click(function () {
 $(".finish").click(function () {
     $('#finish').show();
 });
+
+ function saveEncuesta(){
+         event.preventDefault();
+         //var mac=$('#mac').val();
+        
+         $.ajax({  
+                      
+                     type:"POST",
+                     url:"saves.php",   
+                     data:$('#encuesta-form').serialize(),  
+                       
+                     success:function(data){ 
+                        
+                       
+                          //$('#update-form')[0].reset();  
+                          //$('.close').click(); 
+                          window.location.replace("index2.php");
+                          console.log(data);
+                     }  
+                });
+    } 
 
 </script>
 </body>

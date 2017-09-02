@@ -1,4 +1,5 @@
 <?php
+session_start();
 require('saves/conexion.php');
 $radios=$_POST['radios'];
 $observaciones=$_POST['observaciones'];
@@ -8,19 +9,17 @@ $observaciones=$_POST['observaciones'];
 $tiempoalertamaquina=$_POST['tiempoalertamaquina'];
 $nombremaquinaajuste=$_POST['nombremaquinaajuste'];
 
-$logged_in=$_POST['logged_in'];
+
 $horadeldiaam=$_POST['horadeldiaam'];
 $fechadeldiaam=$_POST['fechadeldiaam'];
 
-$query2="SELECT id FROM login WHERE logged_in='$logged_in'";
-$query4="SELECT idmaquina FROM maquina WHERE mac='$nombremaquinaajuste'";
-$getID = mysqli_fetch_assoc($mysqli->query($query2));
-$userID = $getID['id'];
-$getMachine = mysqli_fetch_assoc($mysqli->query($query4));
-$machineID = $getMachine['idmaquina'];
+
+$userID =$_SESSION['id'];
+$getMachine = $_SESSION['machineName'];
+$machineID = $_SESSION['machineID'];
 
 
-$query="INSERT INTO alertamaquinaoperacion (radios, observaciones, tiempoalertamaquina, id_maquina, id_usuario, horadeldiaam, fechadeldiaam) VALUES ('$radios','$observaciones','$tiempoalertamaquina','$machineID','$userID','$horadeldiaam','$fechadeldiaam')";
+$query="INSERT INTO alertamaquinaoperacion (radios, observaciones, tiempoalertamaquina, id_maquina, id_usuario, horadeldiaam, fechadeldiaam) VALUES ('$radios','$observaciones','$tiempoalertamaquina',$machineID,$userID,'$horadeldiaam','$fechadeldiaam')";
 
 
 $resultado=$mysqli->query($query);
@@ -28,6 +27,7 @@ if ( $resultado) {
 print_r($_POST);
  }else{
             printf("ERROR!!! %s\n", $mysqli->error);
+            echo $query;
           }
 /*
 

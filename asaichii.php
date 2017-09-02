@@ -160,7 +160,7 @@ $(document).ready(function() {
          <div class="congral2">               
             <div class="cont2 center-block">
 
-                <form name="nuevo_registro" id="nuevo_registro" method="POST" action="index2.php">
+                <form name="nuevo_registro" id="nuevo_registro" method="POST" onsubmit="saveAsaichi();">
                     <div class="modal-content">
                         <div class="modal-header">
                             <div class="text-center" style="">ASA-ICHI</div>
@@ -173,7 +173,7 @@ $(document).ready(function() {
             
                                
                                  
-                               
+                                <input type="hidden" name="section" value="asaichi">
                                     <input  style="display: none;" width="150" type="image" name="eviar" value="Registrar" src="images/save.png" class=" "  />
 
 
@@ -185,7 +185,7 @@ $(document).ready(function() {
                                     <div id="timer"><span class="values">00:00:00</span></div>
                                     
                                     <input type="hidden" id="timee" name="tiempo">
-                                    <input type="hidden" name="ciclo" value="start">
+                                    
                                     
                                 </div>
                                 </div>
@@ -209,10 +209,7 @@ $(document).ready(function() {
                             <div class="row ">
                             <div class="center-input">
 
-<input type="text" name="mac"  id="mac" value="<?php 
-                                                     $ip=getenv("REMOTE_ADDR"); 
-                                                     $cmd = "arp  $ip | grep $ip | awk '{ print $3 }'"; 
-                                                     system($cmd);?>"/>
+<input type="text" name="mac"  id="mac" value="<?=$_SESSION['mac'] ?>"/>
                                <!--  
                             <input type="text" name="mac"  id="mac" value="<?=$_SESSION['nommaquina'] ?>"/>
                                 <div class="col-lg-5 col-sm-offset-3 col-sm-5  ">
@@ -276,7 +273,25 @@ timer.addEventListener('started', function (e) {
      
      $( "#stop" ).click(function() {
                                               $( "#nuevo_registro" ).submit();
-                                            });    
+                                            }); 
+    function saveAsaichi(){
+         event.preventDefault();
+         var mac=$('#mac').val();
+         $.ajax({  
+                      
+                     type:"POST",
+                     url:"saves.php",   
+                     data:$('#nuevo_registro').serialize(),  
+                       
+                     success:function(data){ 
+                       
+                          //$('#update-form')[0].reset();  
+                          //$('.close').click(); 
+                          window.location.replace("index2.php?mac="+mac);
+                          console.log(data);
+                     }  
+                });
+    }   
     </script>
      
     

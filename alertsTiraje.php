@@ -86,11 +86,10 @@ switch ($_SESSION['mac']){
         break;
     ////// cambio de area
   case '34:e2:fd:dd:d0:7b':
-        $options[]='ODT Confusa';
-       $options[]='ODT Faltante' ;
-       $options[]= 'Fallo de Maquina';
-       $options[]= 'Mal Ajuste' ;
-       $options[]= 'Basura en la Area' ;
+        $options[]='Papel maltratado';
+       $options[]='Tirar basura' ;
+       $options[]= 'Papel mal registrado';
+       
      //echo $nommaquina;
         break;
   case 'Serigrafia 2':

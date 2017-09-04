@@ -253,7 +253,39 @@ if ( $p==1) {
                 <legend style="font-size:18pt; font-family: 'monse-bold';">ALERTA AJUSTE</legend>
                <div class="form-group" style="width:80% ;margin:0 auto;">
                 <label class="col-md-4 control-label" for="radios" style="display: none;"></label>
+                <?php if ($_SESSION['machineName']=='Serigrafia') { ?>
+               
+
                 <div class="two-columns">
+                  <div class=" radio-menu face">
+                    <input type="radio" name="radios" id="radios-0" value="Preparar Tinta">
+                    Preparar Tinta
+                    </div>
+                <div class=" radio-menu face">
+                    <input type="radio" name="radios" id="radios-1" value="Impresion Mesa">
+                    Impresion Mesa
+                    </div>
+                </div>
+                <div class="two-columns">
+                <div class=" radio-menu face">
+                    <input type="radio" name="radios" id="radios-2" value="Marco mal revelado">
+                    Marco mal revelado
+                    </div>
+                <div class=" radio-menu face">
+                    <input type="radio" name="radios" id="radios-3" value="Marco con poro">
+                    Marco con poro
+                    </div>
+                <div class=" radio-menu face">
+                    <input type="radio" name="radios" id="radios-4" value="ODT confusa">
+                    ODT confusa
+                    </div>
+                    <div class=" radio-menu face">
+                    <input type="radio" name="radios" id="radios-5" value="Tirar basura">
+                    Tirar basura
+                    </div>
+                </div>
+                <?php }else{ ?>
+                 <div class="two-columns">
                   <div class=" radio-menu face">
                     <input type="radio" name="radios" id="radios-0" value="ODT Confusa">
                     ODT Confusa
@@ -277,6 +309,7 @@ if ( $p==1) {
                     Exceso de Dimensiones
                     </div>
                 </div>
+                <?php } ?>
                 </div>
                 <!-- Textarea -->
                 <div class="form-group" style="text-align: center; color:black;">

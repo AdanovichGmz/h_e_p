@@ -5,6 +5,8 @@
         
 
 require('saves/conexion.php');
+require('classes/functions.class.php');
+  $log = new Functions();
   $section=$_POST['section'];
    if ($section=='asaichi') {
 
@@ -23,13 +25,16 @@ require('saves/conexion.php');
         if ($resultado) {
           echo "Todo bien";
         }else{
-          printf($mysqli->error);
-          echo $query;
+          
+          $log->lwrite('asaichi','multi-error');
+          $log->lwrite(printf($mysqli->error),'multi-error');
+          $log->lwrite($query,'multi-error');
+          $log->lclose();
         }
 
      }
      elseif ($section=='ajuste') {
-
+      print_r($_POST);
        $tiempo      = $_POST['tiempo'];
         $nommaquina  = $_SESSION['machineName'];
         $userID   = $_SESSION['id'];
@@ -53,12 +58,18 @@ require('saves/conexion.php');
             if ($resultado) {
         } else {
             printf($mysqli->error);
+             $log->lwrite('ajuste','multi-error');
+             $log->lwrite('error al insertar ajuste','multi-error');
+             $log->lwrite('orden'.$odt,'multi-error');
+              $log->lwrite(printf($mysqli->error),'multi-error');
+              $log->lwrite($query,'multi-error');
+              $log->lclose();
         }
         }
        
      } 
       elseif ($section=='tiraje') {
-       
+            print_r($_POST);
             if ($_POST['qty']=='single') {
              
             $producto=(isset($_POST['producto'])) ?$_POST['producto'] : '';
@@ -144,6 +155,13 @@ require('saves/conexion.php');
              echo "todo bien";
             }else{
               prinf($mysqli->error);
+              $log->lwrite('tiraje','multi-error');
+             $log->lwrite('error al establecer estatus','multi-error');
+             $log->lwrite('orden'.$id,'multi-error');
+              $log->lwrite(printf($mysqli->error),'multi-error');
+              $log->lwrite($update3,'multi-error');
+              $log->lclose();
+
             }
             $i3++;
             }
@@ -152,6 +170,12 @@ require('saves/conexion.php');
             }else{
                         printf($mysqli->error);
                         echo $query;
+                        $log->lwrite('tiraje single','multi-error');
+                       $log->lwrite('error al completar ajustes con tirajes','multi-error');
+                       $log->lwrite('orden'.$numodt,'multi-error');
+                        $log->lwrite(printf($mysqli->error),'multi-error');
+                        $log->lwrite($query,'multi-error');
+                        $log->lclose();
                       }
             } elseif ($_POST['qty']=='multi') {
 
@@ -172,6 +196,11 @@ require('saves/conexion.php');
               $horasdeldia=$_POST['horadeldia'];
               $numodt=$_POST['numodt'];
               $odt=$_POST['odt'];
+                           
+              $log->lwrite('Ordenes guardadas','multi');
+              $log->lwrite($odetes,'multi');
+              $log->lclose();
+
               foreach ($buenos as $key =>$bueno) {
 
                 $producto=$productos[$key];
@@ -202,6 +231,12 @@ require('saves/conexion.php');
                     print_r($_POST);
                     echo "</pre>";
                     echo $query;
+                    $log->lwrite('tiraje multi','multi-error');
+                       $log->lwrite('error al completar ajustes con tirajes','multi-error');
+                       $log->lwrite('orden'.$key,'multi-error');
+                        $log->lwrite(printf($mysqli->error),'multi-error');
+                        $log->lwrite($query,'multi-error');
+                        $log->lclose();
 
                   }
               }
@@ -346,8 +381,14 @@ require('saves/conexion.php');
         if (!$deliv) {
          printf($mysqli->error);
          echo $query_deliv;
+         $log->lwrite('encuesta multi','multi-error');
+                       $log->lwrite('error al actualizar avance','multi-error');
+                       $log->lwrite('orden'.$lastOrder,'multi-error');
+                        $log->lwrite(printf($mysqli->error),'multi-error');
+                        $log->lwrite($query_deliv,'multi-error');
+                        $log->lclose();
         }
-        echo $query_deliv;
+        
 
         while($arrd=mysqli_fetch_array($deliv)) {
           $deliver[] = $arrd['avance'];

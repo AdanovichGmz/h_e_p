@@ -282,6 +282,11 @@ timer.addEventListener('started', function (e) {
  function saveAjuste(){
   var mac=$('#mac').val();
     var order=$('#order').val();
+    if($('#orderID').val()==''){
+        alert('Debes seleccionar una orden para continuar');
+    }else{
+       timer.pause();
+    $('#timee').val(timer.getTimeValues().toString());
      $.ajax({  
                       
                      type:"POST",
@@ -292,10 +297,13 @@ timer.addEventListener('started', function (e) {
                        
                           //$('#update-form')[0].reset();  
                           //$('.close').click(); 
-                          window.location.replace("index3.php?mac="+mac+"&order="+order);
+                          //window.location.replace("index3.php?mac="+mac+"&order="+order);
                           console.log(data);
                      }  
-                });
+                }); 
+    }
+
+     
  }
 
 

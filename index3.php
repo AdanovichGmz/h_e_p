@@ -59,12 +59,19 @@ if (@$_SESSION['logged_in'] != true) {
             $horaAjuste     = $retakingTiro['horadeldia_ajuste'];
         }else{
 
-            $orderID[] = $_GET['order'];
-            $singleID=$_GET['order'];
+            $orderID = explode(",", $_GET['order']);
+           
+            $singleID=$orderID[0];
             $userID      = $_SESSION['id'];
             $getAjuste    = "SELECT horadeldia_ajuste FROM tiraje WHERE id_orden=$singleID AND id_maquina=$machineID";
             $Ajuste       = mysqli_fetch_assoc($mysqli->query($getAjuste));
             $horaAjuste     = $Ajuste['horadeldia_ajuste'];
+            foreach ($orderID as $order) {
+              $getOdt="SELECT numodt FROM ordenes WHERE idorden=$order";
+              $odt=mysqli_fetch_assoc($mysqli->query($getOdt));
+            $odetesArr[]=$odt['numodt'];
+            }
+            $odetes=implode(",", $odetesArr);
 
         }
 
@@ -651,9 +658,9 @@ foreach ($orderID as $odt) {
     </div>
   </div>
   <!-- ********************** Termina Ventana multiples ordenes seleccionadas ******************** -->
- <input type="hidden"  name="numodt" value="<?= implode(",", $orderID) ?>"/>
+ <input type="hidden" id="numodt" name="numodt" value="<?= implode(",", $orderID) ?>"/>
  <input  type="hidden" id="qty" name="qty" value="multi" />
-<input  type="hidden" name="odt" value="<?=$odetes ?>" />
+<input  type="hidden" id="odt" name="odt" value="<?=$odetes ?>" />
   <?php
     } else {
 ?>
@@ -672,7 +679,7 @@ foreach ($orderID as $odt) {
             if ($row = mysqli_fetch_object($resultado01)) {
                 $cantrecib = $row->cantrecibida;
                 
-                $merm = ($row->merma_recibida != null) ? $row->merma_recibida : $cantrecib - $cpedido;
+                $merm = ($row->merma_recibida != null) ? $cantrecib - $cpedido : $cantrecib - $cpedido;
             }
 ?>
     <td class=""><input id="cantidad" class="darkinput" name="cantidad" value="<?= $cantrecib ?>"  readonly></td>
@@ -758,7 +765,7 @@ foreach ($orderID as $odt) {
 ?>
                                                          
                             <input hidden id="producto" name="producto" class=" diseños" value="<?= $row->producto ?>"/>
-                             <input hidden id="numodt" name="numodt" class="diseños" value="<?= implode(",", $orderID) ?>"/>
+                             <input hidden id="numodt" name="numodt" class="diseños" value="<?= implode(',', $orderID) ?>"/>
                              <input hidden id="odt" name="odt" class=" diseños" value="<?= $row->numodt ?>"/>
                       <input hidden id="numproceso"  class=" diseños" value="<?= $row->proceso ?>"/>
                              <?php
@@ -896,7 +903,7 @@ foreach ($orderID as $odt) {
       <div class="container-fluid" style="text-align: center;">
           
           <div id="estilo" style="text-align: center;">
-             <form id="fo4" name="fo4" action="saveeat.php" method="post" class="form-horizontal" >
+             <form id="fo4" name="fo4"  method="post" class="form-horizontal" >
                 <fieldset style="position: relative;left: -15px;">
                 
                 <input hidden type="text"  name="logged_in" id="logged_in" value="<?php
@@ -920,11 +927,11 @@ foreach ($orderID as $odt) {
                    <div class="form-group" style="width:80% ;margin:0 auto;">
                 <label class="col-md-4 control-label" for="radios" style="display: none;"></label>
 
-              <div class=" radio-menu face  eatpanel" onclick="submitEat();showLoad();">
-                <input type="radio" class="" name="radios" id="radios-0" value="Comida" >
+              <div class=" radio-menu face  eatpanel" onclick="showLoad();submitEat();">
+                <input type="radio" class="" name="radios" id="radios-0" value="Comida">
                     COMIDA</div>
-               <div class=" radio-menu face eatpanel" onclick="submitEat();showLoad();">
-               <input type="radio" name="radios" id="radios-1" value="Sanitario">
+               <div class=" radio-menu face eatpanel" onclick="showLoad();submitEat();">
+               <input type="radio" name="radios" id="radios-1" value="Sanitario" >
                    SANITARIO
                     
                     </div>
@@ -983,7 +990,7 @@ foreach ($orderID as $odt) {
  $('.radio-menu').click(function() {
   $('.face-osc').removeClass('face-osc');
   $(this).addClass('face-osc').find('input').prop('checked', true)    
-});
+});                         
                          $( "#saving").click(function() {
                           var buenos=$('#buenos').val();
                           var merma=$('#merma').val();
@@ -995,13 +1002,18 @@ foreach ($orderID as $odt) {
                           else{
                            <?php
     if (count($orderID) > 1) {
-?>
+
+?>                           tiempoTiraje
+                            timer.pause();
+                            $('#tiempoTiraje').val(timer.getTimeValues().toString());   
                             $( "#formbutton" ).click();
                              showLoad();
                             <?php
     } else {
 ?>
                                 if (buenos!=''&&ajuste!='') {
+                                    timer.pause();
+                            $('#tiempoTiraje').val(timer.getTimeValues().toString());  
                              $( "#formbutton" ).click();
                              showLoad();
                            }else{

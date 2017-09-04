@@ -95,11 +95,7 @@ timer.addEventListener('started', function (e) {
 });
 });  
 
-   $('#fo4').submit(function () {
-     timerEat.pause();
-    $('#timeeat').val(timerEat.getTimeValues().toString());
-    timerEat.stop();
-   });
+   
 
    $('.stopeat').click(function () {
     
@@ -163,7 +159,32 @@ timer.addEventListener('started', function (e) {
       }
     
   function submitEat(){
-                      $( "#fo4" ).submit();
+    timerEat.pause();
+              $('#timeeat').val(timerEat.getTimeValues().toString());
+              timerEat.stop();
+    setTimeout(function() {   
+                   $.ajax({  
+                      
+                     type:"POST",
+                     url:"saveeat.php",   
+                     data:$('#fo4').serialize(),  
+                       
+                     success:function(data){ 
+                       
+                          //$('#update-form')[0].reset();  
+                          //$('.close').click(); 
+                          $('.saveloader').hide();
+                          $('.savesucces').show();
+                          setTimeout(function() {   
+                   close_box();
+                }, 1000);
+                          console.log(data);
+                     }  
+                });
+                }, 1000);
+                
+
+                       
                     }
   function pauseConfirm(){
           $('.backdrop, .boxPause').animate({'opacity':'.50'}, 300, 'linear');

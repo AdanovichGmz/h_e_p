@@ -48,7 +48,7 @@ if(@$_SESSION['logged_in'] != true){
     $elem_filter="SELECT id_elemento FROM estandares GROUP BY id_elemento";
     $filter=$mysqli->query($elem_filter);
 
-    $maq_filter="SELECT id_maquina FROM estandares GROUP BY id_maquina";
+    $maq_filter="SELECT idmaquina, nommaquina FROM maquina ORDER BY nommaquina ASC";
     $filter2=$mysqli->query($maq_filter);
 
     ?>
@@ -252,7 +252,7 @@ box-shadow: 3px 4px 18px 0px rgba(0,0,0,0.75);
    <div class=""><select id="filterProces" name="dateFilter">
    <option disabled="true" selected="true">Elige el proceso</option>
      <?php while($rowf2=mysqli_fetch_assoc($filter2)){ ?>
-     <option value="<?=getProcess($rowf2['id_maquina']); ?>"><?=getProcess($rowf2['id_maquina']); ?></option>
+     <option value="<?=getProcess($rowf2['idmaquina']); ?>"><?=$rowf2['nommaquina']; ?></option>
      <?php } ?>
    </select>
 <input hidden  name="datepicker" id="fechadeldia" value="<?php echo date("d/m/Y"); ?>" />

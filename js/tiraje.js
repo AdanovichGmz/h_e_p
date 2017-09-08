@@ -49,6 +49,13 @@ var timer = new Timer();
  var timerAlertm = new Timer();
 $(document).ready(function(){
   timer.start();
+
+  $(document).keypress(function(e) {
+    if(e.which == 13) {
+      event.preventDefault();
+      $('#saving').click();
+}
+});
 /*
 var timepause=$('#pausedorder').val();
 if (timepause=='false') {
@@ -254,7 +261,7 @@ $('.radio-menu').click(function() {
                        
                           //$('#update-form')[0].reset();  
                           //$('.close').click(); 
-                          window.location.replace("encuesta.php?order="+id+"&odt="+odt+"&qty="+qty);
+                         window.location.replace("encuesta.php?order="+id+"&odt="+odt+"&qty="+qty);
                           console.log(data);
                      }  
                 });

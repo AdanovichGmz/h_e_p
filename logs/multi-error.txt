@@ -1,0 +1,5 @@
+[07/Sep/2017:22:09:04] (saves) tiraje single
+[07/Sep/2017:22:09:04] (saves) error al completar ajustes con tirajes
+[07/Sep/2017:22:09:04] (saves) orden148
+[07/Sep/2017:22:09:04] (saves) 0
+[07/Sep/2017:22:09:04] (saves) UPDATE tiraje set producto='114', pedido='20', cantidad=20, buenos=20, defectos=0, merma=0,piezas_ajuste=0, merma_entregada=0, entregados=20, tiempoTiraje='00:00:55', fechadeldia_tiraje='07-09-2017', horadeldia_tiraje='17:06:06', id_user=2,desempenio= WHERE horadeldia_ajuste='17:06:06'  AND id_maquina=1 AND id_orden=148

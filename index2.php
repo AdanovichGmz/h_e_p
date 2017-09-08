@@ -1,6 +1,7 @@
 
 
 <?php
+ini_set("session.gc_maxlifetime","7200");  
 date_default_timezone_set("America/Mexico_City");
  if( !session_id() )
     {

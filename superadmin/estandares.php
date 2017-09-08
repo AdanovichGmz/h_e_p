@@ -41,14 +41,14 @@ if(@$_SESSION['logged_in'] != true){
   
      $maquinas="SELECT nommaquina, idmaquina FROM maquina";
     $n_maquinas=$mysqli->query($maquinas);
-    $usuarios="SELECT * FROM elementos";
+    $usuarios="SELECT * FROM elementos ORDER BY nombre_elemento ASC";
       $n_usuarios=$mysqli->query($usuarios);
 
 
-    $elem_filter="SELECT id_elemento FROM estandares GROUP BY id_elemento";
+    $elem_filter="SELECT * FROM elementos ORDER BY nombre_elemento ASC";
     $filter=$mysqli->query($elem_filter);
 
-    $maq_filter="SELECT id_maquina FROM estandares GROUP BY id_maquina";
+    $maq_filter="SELECT idmaquina,nommaquina FROM maquina";
     $filter2=$mysqli->query($maq_filter);
 
     ?>
@@ -183,7 +183,7 @@ td{
    <div class=""><select id="filterElem" name="dateFilter">
    <option disabled="true" selected="true">Elige el elemento</option>
      <?php while($rowf=mysqli_fetch_assoc($filter)){ ?>
-     <option value="<?=$rowf['id_elemento']?>"><?=getElement($rowf['id_elemento']) ?></option>
+     <option value="<?=$rowf['id_elemento']?>"><?=$rowf['nombre_elemento'] ?></option>
      <?php } ?>
    </select>
 <input hidden  name="datepicker" id="fechadeldia" value="<?php echo date("d/m/Y"); ?>" />
@@ -199,7 +199,7 @@ td{
    <div class=""><select id="filterProces" name="dateFilter">
    <option disabled="true" selected="true">Elige el proceso</option>
      <?php while($rowf2=mysqli_fetch_assoc($filter2)){ ?>
-     <option value="<?=$rowf2['id_maquina']?>"><?=getProcess($rowf2['id_maquina']); ?></option>
+     <option value="<?=$rowf2['idmaquina']?>"><?=$rowf2['nommaquina']; ?></option>
      <?php } ?>
    </select>
 <input hidden  name="datepicker" id="fechadeldia" value="<?php echo date("d/m/Y"); ?>" />
@@ -237,7 +237,7 @@ td{
     
     
     <select  name="nommaquina" id="fm">
-      <option disabled="true" >Proceso</option>
+      <option disabled="true" selected="true" value="none">Proceso</option>
      <?php while($rowf=mysqli_fetch_assoc($n_maquinas)){ ?>
      <option value="<?=$rowf['idmaquina']?>"><?php echo $rowf['nommaquina']; ?></option>
      <?php } ?>
@@ -247,9 +247,7 @@ td{
     <input type="text" id="fo" name="piezas" placeholder="Piezas por Minuto">
     <select  name="elemento" id="fu">
       <option disabled="true" >Elemento</option>
-     <?php while($rowu=mysqli_fetch_assoc($n_usuarios)){ ?>
-     <option value="<?=$rowu['id_elemento']?>"><?php echo $rowu['nombre_elemento']; ?></option>
-     <?php } ?>
+     
    </select>
   
     <input type="submit" value="Guardar">
@@ -275,7 +273,25 @@ td{
   </div>
   </div>
 
+  <div class="box3"><div class="close">x</div>
+  <div class="modal-form">
+  <p id="orderupdate" style="text-align: center; font-weight: bold;"></p>
+    <form id="update_form2" method="post" onsubmit="updateRow2();">
+    <input type="hidden" value="edit"  name="form" >
+   <input type="hidden" id="fi2" name="idstandard" >
+    <input type="text" id="proces" name="nommaquina" readonly="true">
+    
+    <input type="text" id="fpu" name="ajuste" placeholder="Tiempo Estandar de Ajuste">
+    <input type="text" id="fou" name="piezas" placeholder="Piezas por Minuto">
+    <input type="text" id="elem" name="elemento" readonly="true">
   
+    <input type="submit" value="Guardar">
+  </form>
+  </div>
+
+
+
+  </div>
   <script>
                         function startTime() {
                             today = new Date();
@@ -303,15 +319,17 @@ td{
                           var obs=$("#o-"+id).val();
                           var tim=$("#t-"+id).val();
                           var maq=$("#n-"+id).val();
-                          $('#form').val('edit');
+                          
 
                           $("#order").html('Estandar: '+aid);
-                          $("#fi").val(aid);
-                          $("#fu").val(tim);
-                          //$("#fm").val(maq);
-                           $('#fp').val(rad);
-                          $("#fo").val(obs);
-                          $('#fm').val(maq);
+                          $("#proces").val(maq);
+                          $("#elem").val(tim);
+                          
+
+                          $("#fi2").val(aid);
+                           $('#fpu').val(rad);
+                          $("#fou").val(obs);
+                         
                           
                         }
                         function delet(id){
@@ -355,7 +373,55 @@ td{
                        
                           //$('#update-form')[0].reset();  
                           $('.close').click();  
-                          $('.div-tabla').html(data);  
+                          $('.div-tabla').html(data);
+                          //$('#fm').val('none');
+                          console.log('perro');
+                          $('#fm option[value=none]').attr('selected','selected');
+                          $("#fu option").remove();
+
+                     }  
+                });  
+           }  
+      }
+      function updateRow2(){  
+            event.preventDefault();
+           if($('#ft').val() == "")  
+           {  
+                alert("Name is required");  
+           }  
+           else if($('#fm').val() == '')  
+           {  
+                alert("Address is required");  
+           }  
+           else if($('#fu').val() == '')  
+           {  
+                alert("Designation is required");  
+           }  
+           else if($('#fh').val() == '')  
+           {  
+                alert("Age is required");  
+           }
+           else if($('#ff').val() == '')  
+           {  
+                alert("Age is required");  
+           }    
+           else  
+           {  
+                $.ajax({  
+                      
+                     type:"POST",
+                     url:"newStandard.php",   
+                     data:$('#update_form2').serialize(),  
+                       
+                     success:function(data){ 
+                       
+                          //$('#update-form')[0].reset();  
+                          $('.close').click();  
+                          $('.div-tabla').html(data);
+                          //$('#fm').val('none');
+                          
+                         
+
                      }  
                 });  
            }  
@@ -399,6 +465,27 @@ td{
                           //$('#update-form')[0].reset();  
                           //$('.close2').click();  
                           $('.div-tabla').html(data);  
+                     }  
+                });
+
+
+ console.log($( "#filterElem" ).val());
+});
+
+      $( "#fm" ).change(function() {
+        var emlem_id= $( "#fm" ).val();
+        $.ajax({  
+                      
+                     type:"POST",
+                     url:"standardForm.php",   
+                     data:{maquina:emlem_id},  
+                       
+                     success:function(data){ 
+                       
+                          //$('#update-form')[0].reset();  
+                          //$('.close2').click();  
+                          $('#fu').html(data);
+                          console.log(data);  
                      }  
                 });
 

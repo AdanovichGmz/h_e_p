@@ -2,7 +2,7 @@
 <?php
 
 
-
+ini_set("session.gc_maxlifetime","7200");  
 session_start();
 require("saves/conexion.php");
 

@@ -25,9 +25,8 @@ function getProcess($id){
  		$idstandard=$_POST['idstandard'];
  		$ajuste=$_POST['ajuste']*60;
  		$piezas=$_POST['piezas'];
- 		$elemento=$_POST['elemento'];
- 		$proceso=$_POST['nommaquina'];
- 		$upadte_query="UPDATE estandares SET ajuste_standard=$ajuste,piezas_por_hora=$piezas,id_elemento=$elemento,id_maquina=$proceso WHERE id_estandard=$idstandard";
+ 		
+ 		$upadte_query="UPDATE estandares SET ajuste_standard=$ajuste,piezas_por_hora=$piezas WHERE id_estandard=$idstandard";
  		$result=$mysqli->query($upadte_query);
 
  		if ($result) {
@@ -37,6 +36,7 @@ function getProcess($id){
  		}
  		else{
  			printf($mysqli->error);
+      echo $upadte_query;
  		}
  		
  	}

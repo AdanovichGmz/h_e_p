@@ -1,5 +1,5 @@
 <?php
-
+ini_set("session.gc_maxlifetime","7200");  
         session_start();
      
         
@@ -10,7 +10,7 @@ require('classes/functions.class.php');
   $section=$_POST['section'];
    if ($section=='asaichi') {
 
-
+   
        $tiempo=$_POST['tiempo'];
         $mac=$_POST['mac'];
         $logged_in=$_SESSION['id'];
@@ -69,7 +69,7 @@ require('classes/functions.class.php');
        
      } 
       elseif ($section=='tiraje') {
-            print_r($_POST);
+            
             if ($_POST['qty']=='single') {
              
             $producto=(isset($_POST['producto'])) ?$_POST['producto'] : '';
@@ -86,21 +86,34 @@ require('classes/functions.class.php');
             $entregados=$_POST['entregados'];
             $tiempoTiraje=$_POST['tiempoTiraje'];
             $fechadeldia=$_POST['fechadeldia'];
-            $horadeldia=$_POST['horadeldia'];
+            $horadeldia=$_POST['hour'];
             $merma_entregada=$_POST['merma-entregada'];
             $passmerma=$merma-($merma_entregada+$defectos+$ajuste);
-            
+            $element=$_POST['element'];
+    
            
             $userID = $_SESSION['id'];
-
+            
+            $seconds = strtotime("1970-01-01 $tiempoTiraje UTC");
+            
            
             $machineID = $_SESSION['machineID'];
             $machineName = $_SESSION['machineName'];
+
+            $standar_query2 = "SELECT * FROM estandares WHERE id_maquina=$machineID AND id_elemento= $element";
+            
+            $getstandar     = mysqli_fetch_assoc($mysqli->query($standar_query2));
+            $estandar       = $getstandar['piezas_por_hora'];
+            //calculando desempeño para pieza actual
+            $tiraje_estandar=($seconds*$estandar)/3600;
+            
+            $tiraje_desemp=($entregados*100)/$tiraje_estandar;
+            echo $standar_query2;
             $_query="select MAX(idtiraje) as last FROM tiraje";
             $hora=$_POST['hour'];
             $getLast = mysqli_fetch_assoc($mysqli->query($_query));
             $lastId=$getLast['last'];
-            $query="UPDATE tiraje set producto='$producto', pedido='$pedido', cantidad=$cantidad, buenos=$buenos, defectos=$defectos, merma=$merma,piezas_ajuste=$ajuste, merma_entregada=$merma_entregada, entregados=$entregados, tiempoTiraje='$tiempoTiraje', fechadeldia_tiraje='$fechadeldia', horadeldia_tiraje='$horadeldia', id_user=$logged_in WHERE horadeldia_ajuste='$hora'  AND id_maquina=$machineID AND id_orden=$numodt";
+            $query="UPDATE tiraje set producto='$producto', pedido='$pedido', cantidad=$cantidad, buenos=$buenos, defectos=$defectos, merma=$merma,piezas_ajuste=$ajuste, merma_entregada=$merma_entregada, entregados=$entregados, tiempoTiraje='$tiempoTiraje', fechadeldia_tiraje='$fechadeldia', horadeldia_tiraje='$horadeldia', id_user=$logged_in,desempenio=$tiraje_desemp WHERE horadeldia_ajuste='$hora'  AND id_maquina=$machineID AND id_orden=$numodt";
 
            
 
@@ -178,7 +191,7 @@ require('classes/functions.class.php');
                         $log->lclose();
                       }
             } elseif ($_POST['qty']=='multi') {
-
+              print_r($_POST);
               $hora=$_POST['hour'];
               $buenos=$_POST['buenos'];
               $defectos=$_POST['defectos'];
@@ -196,7 +209,7 @@ require('classes/functions.class.php');
               $horasdeldia=$_POST['horadeldia'];
               $numodt=$_POST['numodt'];
               $odt=$_POST['odt'];
-                           
+                 $seconds = strtotime("1970-01-01 $tiempotiraje UTC");          
               $log->lwrite('Ordenes guardadas','multi');
               $log->lwrite($odetes,'multi');
               $log->lclose();
@@ -219,8 +232,16 @@ require('classes/functions.class.php');
                 $machineID = $_SESSION['machineID'];
                 $machineName = $_SESSION['machineName'];
                 
-
-                $query="UPDATE tiraje set producto='$producto', pedido='$pedido', cantidad=$cantidad, buenos=$buenoss, defectos=$defecto, merma=$merma,piezas_ajuste=$ajust, merma_entregada=$merma_entregada, entregados=$entregados, tiempoTiraje='$tiempotiraje', fechadeldia_tiraje='$fecha', horadeldia_tiraje='$horasdeldia', id_user=$logged WHERE horadeldia_ajuste='$hora'  AND id_maquina=$machineID AND id_orden=$key";
+                 $standar_query2 = "SELECT * FROM estandares WHERE id_maquina=$machineID AND id_elemento= $producto";
+            
+            $getstandar     = mysqli_fetch_assoc($mysqli->query($standar_query2));
+            $estandar       = $getstandar['piezas_por_hora'];
+            //calculando desempeño para pieza actual
+            $tiraje_estandar=($seconds*$estandar)/3600;
+            
+            $tiraje_desemp=($entregados*100)/$tiraje_estandar;
+            echo $standar_query2;
+                $query="UPDATE tiraje set producto='$producto', pedido='$pedido', cantidad=$cantidad, buenos=$buenoss, defectos=$defecto, merma=$merma,piezas_ajuste=$ajust, merma_entregada=$merma_entregada, entregados=$entregados, tiempoTiraje='$tiempotiraje', fechadeldia_tiraje='$fecha', horadeldia_tiraje='$horasdeldia',desempenio=$tiraje_desemp, id_user=$logged WHERE horadeldia_ajuste='$hora'  AND id_maquina=$machineID AND id_orden=$key";
                 $inserted=$mysqli->query($query);
                   if ($inserted) {
                     
@@ -349,6 +370,7 @@ require('classes/functions.class.php');
         $b = array('inicio','en pausa','retomado');
 
         $is_complete=is_in_array($b, $deliver);
+        
         if ($is_complete==false) {
           $querydeliv="UPDATE ordenes SET entregado='true' WHERE idorden=$lastOrder";
         $mysqli->query($querydeliv);
@@ -396,10 +418,10 @@ require('classes/functions.class.php');
         }
 
         $b = array('inicio','en pausa','retomado');
-        
+        echo $query_deliv;
 
         $is_complete=is_in_array($b, $deliver);
-
+       
         if ($is_complete==false) {
           $querydeliv="UPDATE ordenes SET entregado='true' WHERE idorden=$lastOrder";
         $mysqli->query($querydeliv);

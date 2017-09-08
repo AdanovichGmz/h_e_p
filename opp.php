@@ -1,7 +1,7 @@
 <?php 
  require('saves/conexion.php');
 
-print_r($_POST);
+
 $datos=$_POST["datos"]; 
 $display=$_POST["display"];
  $order=($_POST["order"]==1)? 2 : $_POST["order"];

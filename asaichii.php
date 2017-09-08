@@ -1,6 +1,7 @@
  <?php
+ ini_set("session.gc_maxlifetime","7200");  
     if( !session_id() )
-    {
+    {   
         session_start();
      
         
@@ -160,7 +161,7 @@ $(document).ready(function() {
          <div class="congral2">               
             <div class="cont2 center-block">
 
-                <form name="nuevo_registro" id="nuevo_registro" method="POST" onsubmit="saveAsaichi();">
+                <form name="nuevo_registro" id="nuevo_registro" method="POST" onsubmit="">
                     <div class="modal-content">
                         <div class="modal-header">
                             <div class="text-center" style="">ASA-ICHI</div>
@@ -169,7 +170,7 @@ $(document).ready(function() {
                             <div class="row" style="">
                             <div class="watch-container">
                                <a href="logout.php" ><div class="boton rojo"><img src="images/salir.png"><span>SALIR&nbsp&nbsp&nbsp&nbsp</span></div></a>
-                                <a href="#" id="stop" ><div class="boton azul"><img src="images/guardar.png"><span>GUARDAR</span></div> </a> 
+                                <a href="#" id="stop" ><div class="boton azul" onclick="saveAsaichi();"><img src="images/guardar.png" ><span>GUARDAR</span></div> </a> 
             
                                
                                  
@@ -271,11 +272,10 @@ timer.addEventListener('started', function (e) {
     $('#chronoExample .values').html(timer.getTimeValues().toString());
 });
      
-     $( "#stop" ).click(function() {
-                                              $( "#nuevo_registro" ).submit();
-                                            }); 
+     
     function saveAsaichi(){
-         event.preventDefault();
+        timer.pause();
+    $('#tiempo').val(timer.getTimeValues().toString());
          var mac=$('#mac').val();
          $.ajax({  
                       

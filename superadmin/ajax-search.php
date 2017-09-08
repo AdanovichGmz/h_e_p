@@ -1,6 +1,6 @@
 <?php
 require('../saves/conexion.php');
-$limit = 40;
+$limit = 200;
 if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };  
 $start_from = ($page-1) * $limit;  
 $term = $_REQUEST['condition']; 

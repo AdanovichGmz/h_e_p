@@ -270,16 +270,16 @@ function getCheckStatus($id_process,$process){
          <div   class="more" onclick="moreProcess('Digital-<?=$fila['idorden'] ?>','<?=$fila['idorden'] ?>','Digital')"></div>
        </div>
        </div>
-       <div id="LetterPres-<?=$fila['idorden'] ?>" class="checgroup">
-         <div class="checkicon <?=getCheckStatus($fila['idorden'],'LetterPres');?>"   onclick="checking(<?=$fila['idorden'] ?>,'LetterPres-<?=$fila['idorden'] ?>');">
-         <input type="checkbox" class="chk" value="LetterPres" name=  "procesos_<?=$fila['idorden'] ?>[]"   >
+       <div id="LetterPress-<?=$fila['idorden'] ?>" class="checgroup">
+         <div class="checkicon <?=getCheckStatus($fila['idorden'],'LetterPress');?>"   onclick="checking(<?=$fila['idorden'] ?>,'LetterPress-<?=$fila['idorden'] ?>');">
+         <input type="checkbox" class="chk" value="LetterPress" name=  "procesos_<?=$fila['idorden'] ?>[]"   >
          </div>
          <div class="checktext">Lpr</div>
          
-        <?=getqty($fila['idorden'],'LetterPres') ?>
+        <?=getqty($fila['idorden'],'LetterPress') ?>
           <div class="controls">
-                  <div   class="less" onclick="lessProcess('LetterPres-<?=$fila['idorden'] ?>')"></div>
-         <div   class="more" onclick="moreProcess('LetterPres-<?=$fila['idorden'] ?>','<?=$fila['idorden'] ?>','LetterPres')"></div>
+                  <div   class="less" onclick="lessProcess('LetterPress-<?=$fila['idorden'] ?>')"></div>
+         <div   class="more" onclick="moreProcess('LetterPress-<?=$fila['idorden'] ?>','<?=$fila['idorden'] ?>','LetterPress')"></div>
        </div>
        </div>
        <div id="Plastificado-<?=$fila['idorden'] ?>" class="checgroup">

@@ -1,5 +1,6 @@
 
 <?php
+ini_set("session.gc_maxlifetime","7200");  
 date_default_timezone_set("America/Mexico_City");
 if (isset($_COOKIE['ajuste'])) {
     setcookie('ajuste', true, time() - 3600);
@@ -121,10 +122,10 @@ if (@$_SESSION['logged_in'] != true) {
     //obtenemos el tiempo muerto sumando las idas al sanitario
     $etequery2 = "SELECT  IFNULL(SUM( TIME_TO_SEC( breaktime) ),0) AS tiempo_muerto  FROM breaktime WHERE id_maquina=$machineID AND radios='Sanitario' AND fechadeldiaam = '$today'";
     //obtenemos la calidad a la primera operando entregados-defectos*100/cantidadpedida  
-    $etequery3 = "SELECT COALESCE(((SELECT SUM( entregados ) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')-(SELECT SUM( defectos ) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today'))*100/ (SELECT SUM( cantidad ) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')) as calidad_primera";
+    $etequery3 = "SELECT COALESCE((SELECT SUM( entregados ) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')/ (SELECT SUM(cantidad) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today'))*100 as calidad_primera";
     //obtenemos desempeño operando entregados+merma
-    $etequery4 = "SELECT COALESCE(((SELECT SUM(entregados) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')+(SELECT SUM(merma) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_ajuste = '$today'))) as desempenio";
-    
+    $etequery4 = "SELECT SUM(desempenio) AS desemp ,COUNT(desempenio) AS tirajes,SUM(produccion_esperada) AS esper FROM `tiraje` WHERE fechadeldia_tiraje='$today' AND id_maquina=$machineID";
+    $etequery5 = "SELECT COALESCE((SELECT SUM(entregados) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')) as desempenio";
     //obtenemos el elemento o producto
     $getelement = mysqli_fetch_assoc($resultado02_5);
     $element    = $getelement['producto'];
@@ -156,19 +157,25 @@ if (@$_SESSION['logged_in'] != true) {
     
     $getQuality = mysqli_fetch_assoc($mysqli->query($etequery3));
     $Quality    = $getQuality['calidad_primera'];
-    
-    $getEfec       = mysqli_fetch_assoc($mysqli->query($etequery4));
+    $getdesemp= $mysqli->query($etequery4);
+    $getEfec       = mysqli_fetch_assoc($getdesemp);
     //obtenemos el porcentaje de estandar segundos*estandar/1hora
-    $estandar_prod = ($seconds * $estandar) / 3600;
+    $estandar_prod = (($seconds-3600) * $estandar) / 3600;
     
-    $desempenio = $getEfec['desempenio'] / $estandar_prod;
+    $desempenio =($getEfec['tirajes']>0)? ($getEfec['desemp']*100)/($getEfec['tirajes']*100) : 0;
     //echo $etequery3;
     //$realtime   = ($totalTime * 1) / 3600;
     
-    $dispon     = ($totalTime * 100) / $seconds;
-    $disponible = round($dispon, 1);
-    $getEte     = (($dispon / 100) * ($Quality / 100) * ($desempenio / 100)) * 100;
+    $dispon     =($seconds>14400)? ($totalTime * 100) / ($seconds-3600) : ($totalTime * 100) / $seconds;
+    //$disponible = round($dispon, 1);
+    $disponible = round($dispon);
     
+    $real       = mysqli_fetch_assoc($mysqli->query($etequery5));
+
+
+    //echo "<p style='color:#fff;'>dispon ".$dispon." calidad ".$Quality." desempeño ".$desempenio." prod esperada ".$getEfec['esper']." real ".$real['desempenio']." calidad ".$Quality." tiempo hasta ahora: ".$seconds."</p>";
+    $getEte     = (($dispon / 100) * ($Quality / 100) * ($desempenio / 100)) * 100;
+    $showpercent=100 - $getEte;
     
 ?>
     <!-- bar chart -->
@@ -179,19 +186,20 @@ if (@$_SESSION['logged_in'] != true) {
       google.setOnLoadCallback(drawChart);
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
-          ['Type', 'ETE'],['ete', <?php
+          ['Type', 'ETE'],['<?="ETE ".round($getEte)."%" ?>', <?php
     echo $getEte;
-?>],['Desperdicio', <?php
-    echo 100 - $getEte;
+?>],['<?="MUDA ".round(($showpercent<0)? 0 : $showpercent)."%" ?>', <?=($showpercent<0)? 0 : $showpercent;
+     
 ?>] ]);
         var options = {chartArea: {width: '90%',  height: '90%'},
                        
-                       pieSliceTextStyle: {color: 'white', fontSize: 14},
-                       title: 'ETE',
-                       legend: 'none', 
+                       pieSliceTextStyle: {color: 'white', fontSize: 16},
+                       
+                       legend: 'none',
+                    pieSliceText: 'label',
                        is3D:false,                                               
                       // enableInteractivity: false,
-                       colors: ['#E84C3D','#404040' ],
+                       colors: ['#05BDE3','#1F242A' ],
                                            
                        backgroundColor: 'transparent'
         };
@@ -200,27 +208,45 @@ if (@$_SESSION['logged_in'] != true) {
 
         chart.draw(data, options);
       }
+
     </script>
     <script type="text/javascript">
     google.load("visualization", "1", {packages:["corechart"]});
     google.setOnLoadCallback(drawChart);
     function drawChart() {
       var data = google.visualization.arrayToDataTable([
-          ['valor', 'datos'],
+          ['valor', 'porcentaje'],
          <?php
-    echo "['disponibilidad'," . $dispon . "],";
-    echo "['desempeno'," . ($desempenio * 100) . "],";
-    echo "['calidad'," . $Quality . "],";
+    echo "['DISPONIBILIDAD'," . $dispon . "],";
+    echo "['DESEMPEÑO'," . $desempenio  . "],";
+    echo "['CALIDAD'," . $Quality . "],";
     
 ?> ]);
         var options = { // api de google chats, son estilos css puestos desde js
-            chartArea: {width: '85%', height: '90%'},
-            width: 315, 
-            height: 230,
+            chartArea: {width: '100%', height: '90%'},
+            width: "100%", 
+            height: "100%",
+            chartArea: {left: 25, top: 10, width: "100%", height: "80%"},
             legend: 'none',
-            enableInteractivity: false,                                               
-            fontSize: 12,
-            colors: ['#00B050'],    
+            enableInteractivity: true,                                               
+            fontSize: 11,
+            hAxis: {
+                    textStyle: {
+                      color: '#ffffff'
+                    }
+                  },
+            vAxis: {
+                textStyle: {
+                      color: '#ffffff'
+                    },
+            viewWindowMode:'explicit',
+            viewWindow: {
+              max:100,
+              min:0
+            }
+        },
+
+            colors: ['#05BDE3'],    
             backgroundColor: 'transparent'
         };
       var chart = new google.visualization.ColumnChart(document.getElementById("columnchart"));
@@ -302,9 +328,9 @@ if (@$_SESSION['logged_in'] != true) {
     font-family: "monse-bold";
   }
   .darkinput{
-    background: #393939!important;
+    background: #343434!important;
     color: #fff!important;
-    border:1px solid #444444!important;
+        border: 1px solid #5C5C5C!important;
   }
   .diferentbutton{
     cursor: pointer;
@@ -434,8 +460,8 @@ if (@$_SESSION['logged_in'] != true) {
 
            
   <li style="float:right"></li>
-   <li style="float:right"><span id="hora" ></span></li>
-    <li style="float:right"><span><?php
+   <li style="float:right"><span id="hora" >Produccion esperada: 12</span></li>
+    <li style="float:right ;display:none;"><span><?php
     $fecha = strftime("%Y-%m-%d", time());
     echo $fecha;
 ?></span></li>
@@ -443,7 +469,7 @@ if (@$_SESSION['logged_in'] != true) {
 </ul>
         
 <div class="statistics">
-  <div class="stat-panel" style="background: #fff;">
+  <div class="stat-panel">
   <div class="stat-head"><div class="efectivity"><?php
     echo round($getEte);
 ?>%</div></div>
@@ -534,29 +560,17 @@ if (@$_SESSION['logged_in'] != true) {
                     </div>
   </div>
   <div class="stat-panel" style="">
-<div style="width: 100%; height: 100%; position: absolute;">
-    <div class="graficabarras">
-              <div class="tit">  
-                <div class="dis">Disponibilidad</div>
-                <div class="des">Desempeño</div>
-                <div class="cal">Calidad</div>
-                
-              </div>  
-              <div class="num">
-                  <div class="cien">100</div>
-                  <div class="setenta">75</div>
-                  <div class="cincuenta">50</div>
-                  <div class="vente">25</div>
-                  <div class="cero">0</div>
-              </div>
-                <!-- <div id="_GraficaInter"></div> -->
-                <div id="columnchart" style="top:10px; position:absolute; fill:white;"></div>
 
-            </div>
-</div>
+    
+                <!-- <div id="_GraficaInter"></div> -->
+                <div id="columnchart" style="top:10px;width: 100%; height: 300px; position:absolute; "></div>
+
+            
+
   </div>
 </div>
  <form name="fvalida" id="fvalida" method="POST" onsubmit="saveTiro()">
+ <input type="hidden" name="element" value="<?=$element ?>">
   <input type="hidden" name="section" value="tiraje">
  <input type="hidden" name="hour" value="<?= (isset($_POST['horadeldia'])) ? $_POST['horadeldia'] : $horaAjuste; ?>"> 
 <div class="statistics">

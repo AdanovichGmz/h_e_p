@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-
+<?php ini_set("session.gc_maxlifetime","7200");   ?>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />

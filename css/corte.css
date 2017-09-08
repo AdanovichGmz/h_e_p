@@ -70,16 +70,15 @@ box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.61);
 }
 .stat-panel{
   margin: 5px;
-  -webkit-box-shadow: 2px 2px 3px 0px rgba(50, 50, 50, 0.61);
--moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.61);
-box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.61);
+  
   width: 32%;
   height: 300px;
-  background: #fff;
+  background: #343434;
   display: block;
  display: inline-block;
  border-radius: 3px;
  position: relative;
+ border:1px solid #5C5C5C;
 }
 
 .user-photo{ background-position: center; background-size: cover;  -webkit-background-size: cover; -webkit-background-size: cover;
@@ -108,10 +107,9 @@ ul {
     overflow: hidden;
     height: 65px;
     /* background-color: #002D44; */
-    background-color: #000;
-    -webkit-box-shadow: 2px 2px 3px 0px rgba(50, 50, 50, 0.61);
--moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.61);
-box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.61);
+    background-color:#212121;
+    border-bottom: 1px solid #5C5C5C;
+   
 }
 
 li {
@@ -136,7 +134,7 @@ li span:not(.span-button) {
 }
 .orders {
     border-collapse: collapse;
-    width: 300px;
+    width: 96%;px;
     margin: 0 auto;
     text-align: center;
     background:#F3F5F7;
@@ -145,8 +143,8 @@ li span:not(.span-button) {
 }
 
 .gree{
-  background:#16A085;
-  border:1px solid #16A085;
+  background:#262626;
+  border:1px solid #5C5C5C;
 }
 .oran{
   background:#D35400;
@@ -200,11 +198,12 @@ li span:not(.span-button) {
 .stat-head{
   width: 100%;
   height: 70px;
-  background: #16A085;
+  background: #262626;
   margin-bottom: 10px;
   position: relative;
   border-top-left-radius: 3px;
    border-top-right-radius: 3px;
+       border-bottom: 1px solid #5C5C5C;
 }
 .efectivity{
   position: absolute;
@@ -214,7 +213,8 @@ li span:not(.span-button) {
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 70px;
-  color:#fff;
+  font-weight: bold;
+  color:#CECECE;
   line-height: 70px;
   
 }

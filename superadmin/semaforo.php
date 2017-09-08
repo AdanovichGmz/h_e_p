@@ -99,11 +99,12 @@
                   }
 
                   //for total count data
-                  $limit = 40;
+                  $limit = 200;
                   $countSql = "SELECT COUNT(idorden) FROM ordenes WHERE entregado NOT IN('true')";  
                   $tot_result = $mysqli->query($countSql);   
                   $row = mysqli_fetch_row($tot_result);  
-                  $total_records = $row[0];  
+                  $total_records = $row[0]; 
+
                   $total_pages = ceil($total_records / $limit);
 
                   //for first time load data
@@ -113,7 +114,7 @@
                   
                   
 
-                 while ($fila = mysqli_fetch_array($resultados) ){
+                 while ($fila = mysqli_fetch_assoc($resultados) ){
                   $orders[$fila['numodt']]=$fila;
                  }
                  
@@ -247,7 +248,7 @@ width: 75px;
                    <th class="vertical"><div class="vertical">Serigrafia</div></th>
                    <th class="vertical"><div class="vertical">Offset</div></th>
                    <th class="vertical"><div class="vertical">Digital</div></th>
-                    <th class="vertical"><div class="vertical">LetterPres</div></th>
+                    <th class="vertical"><div class="vertical">LetterPresS</div></th>
                    <th class="vertical"><div class="vertical">Plastificado</div></th>
                    <th class="vertical"><div class="vertical">Encuadernacion</div></th>
                    <th class="vertical"><div class="vertical">HotStamping</div></th>
@@ -278,7 +279,7 @@ width: 75px;
                           <td ><?=getStatus($fila['numodt'],'Serigrafia');?> </td>
                           <td ><?=getStatus($fila['numodt'],'Offset');?> </td>
                           <td ><?=getStatus($fila['numodt'],'Digital');?> </td>
-                          <td ><?=getStatus($fila['numodt'],'LetterPres');?> </td>
+                          <td ><?=getStatus($fila['numodt'],'LetterPress');?> </td>
                           <td ><?=getStatus($fila['numodt'],'Plastificado');?> </td>
                           <td ><?=getStatus($fila['numodt'],'Encuadernacion');?> </td>
                           <td ><?=getStatus($fila['numodt'],'HotStamping');?> </td>

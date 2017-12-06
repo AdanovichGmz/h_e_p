@@ -1,6 +1,6 @@
-﻿
+﻿var jQuery1102=$.noConflict(true);
 function createChart() {
-    $("#_GraficaInter").kendoChart({
+    jQuery1102("#_GraficaInter").kendoChart({
         theme: "metro",
         chartArea: { background: "transparent" },
         title: {
@@ -51,5 +51,5 @@ function createChart() {
     });
 }
 
-$(document).ready(createChart);
-$(document).bind("kendo:skinChange", createChart);
+jQuery1102(document).ready(createChart);
+jQuery1102(document).bind("kendo:skinChange", createChart);

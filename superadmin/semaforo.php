@@ -98,9 +98,9 @@
 
                   }
 
-                  //for total count data
+                  //for total count data $countSql = "SELECT COUNT(idorden) FROM ordenes WHERE entregado NOT IN('true')"; 
                   $limit = 200;
-                  $countSql = "SELECT COUNT(idorden) FROM ordenes WHERE entregado NOT IN('true')";  
+                  $countSql = "SELECT COUNT(idorden) FROM ordenes ";  
                   $tot_result = $mysqli->query($countSql);   
                   $row = mysqli_fetch_row($tot_result);  
                   $total_records = $row[0]; 
@@ -110,7 +110,7 @@
                   //for first time load data
                   if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };  
                   $start_from = ($page-1) * $limit; 
-                   $resultados=$mysqli->query("SELECT idorden,numodt FROM ordenes WHERE entregado NOT IN('true') ORDER BY idorden ASC LIMIT $start_from, $limit"); 
+                   $resultados=$mysqli->query("SELECT idorden,numodt,fechafin FROM ordenes WHERE entregado NOT IN('true') ORDER BY fechafin ASC LIMIT $start_from, $limit"); 
                   
                   
 

@@ -4,7 +4,7 @@ $limit = 200;
 if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };  
 $start_from = ($page-1) * $limit;  
   
-$sql = "SELECT idorden,numodt FROM ordenes WHERE entregado NOT IN('true') ORDER BY idorden LIMIT $start_from, $limit";  
+$sql = "SELECT idorden,numodt FROM ordenes  ORDER BY idorden LIMIT $start_from, $limit";  
 $rs_result = $mysqli->query($sql); 
 ?>
 

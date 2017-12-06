@@ -21,16 +21,17 @@ if(@$_SESSION['logged_in'] != true){
   <?php
   function personalData($idmaquina,$maquina,$photo){
 require('../saves/conexion.php');
-
-    $query1 = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT nombre_elemento FROM elementos WHERE id_elemento=o.producto) AS nombre_elemento,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$maquina' HAVING status='actual' ";
+$process=($maquina=='Serigrafia2'||$maquina=='Serigrafia3')?'Serigrafia':$maquina;
+             $processID=($idmaquina==20||$idmaquina==21)? 10:$idmaquina;
+    $query1 = "SELECT o.*,p.proceso,p.id_proceso,pp.*,(SELECT nombre_elemento FROM elementos WHERE id_elemento=o.producto) AS nombre_elemento FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden INNER JOIN personal_process pp ON pp.id_orden=o.idorden WHERE proceso_actual='$maquina' AND nombre_proceso='$process' AND status='actual' ";
     
     $actual = $mysqli->query($query1);
      
-    $query2 = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT nombre_elemento FROM elementos WHERE id_elemento=o.producto) AS nombre_elemento,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$maquina' HAVING status='siguiente' ";
+    $query2 = "SELECT o.*,p.proceso,p.id_proceso,pp.*,(SELECT nombre_elemento FROM elementos WHERE id_elemento=o.producto) AS nombre_elemento FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden INNER JOIN personal_process pp ON pp.id_orden=o.idorden WHERE proceso_actual='$maquina' AND nombre_proceso='$process' AND status='siguiente'";
     
     $siguiente = $mysqli->query($query2);
     $resultado02_5 = $mysqli->query($query2);
-    $query3 = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT nombre_elemento FROM elementos WHERE id_elemento=o.producto) AS nombre_elemento,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$maquina' HAVING status='preparacion' ";
+    $query3 = "SELECT o.*,p.proceso,p.id_proceso,pp.*,(SELECT nombre_elemento FROM elementos WHERE id_elemento=o.producto) AS nombre_elemento FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden INNER JOIN personal_process pp ON pp.id_orden=o.idorden WHERE proceso_actual='$maquina' AND nombre_proceso='$process' AND status='preparacion' ";
     
     $preparacion = $mysqli->query($query3);
 
@@ -53,15 +54,16 @@ require('../saves/conexion.php');
 
        /****************** Calcular ETE ******************/
     $today     = date("d-m-Y");
-    $etequery1 = "SELECT COALESCE((SELECT  IFNULL(SUM( TIME_TO_SEC( tiempoTiraje) ),0)  FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today')+(SELECT  IFNULL(SUM( TIME_TO_SEC( tiempo_ajuste)),0) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_ajuste = '$today')+(SELECT  IFNULL(SUM( TIME_TO_SEC( tiempoalertamaquina) ),0)  FROM alertamaquinaoperacion WHERE id_maquina=$idmaquina AND fechadeldiaam = '$today') + (SELECT  IFNULL(SUM( TIME_TO_SEC(tiempoalertamaquina) ),0) FROM alertageneralajuste WHERE id_maquina=$idmaquina AND fechadeldiaam = '$today')) as tiempo_real";
+   
+     $etequery1 = "SELECT COALESCE((SELECT  IFNULL(SUM( TIME_TO_SEC( tiempoTiraje) ),0)  FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today' AND tiempoTiraje IS NOT NULL)+(SELECT  IFNULL(SUM( TIME_TO_SEC( tiempo_ajuste)),0) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_ajuste = '$today' AND tiempoTiraje IS NOT NULL)+(SELECT  IFNULL(SUM( TIME_TO_SEC( tiempoalertamaquina) ),0)  FROM alertamaquinaoperacion WHERE id_maquina=$idmaquina AND fechadeldiaam = '$today') + (SELECT  IFNULL(SUM( TIME_TO_SEC(tiempoalertamaquina) ),0) FROM alertageneralajuste WHERE id_maquina=$idmaquina AND fechadeldiaam = '$today')) as tiempo_real";
     //obtenemos el tiempo muerto sumando las idas al sanitario
-    $etequery2 = "SELECT  IFNULL(SUM( TIME_TO_SEC( breaktime) ),0) AS tiempo_muerto  FROM breaktime WHERE id_maquina=$idmaquina AND radios='Sanitario' AND fechadeldiaam = '$today'";
-    //obtenemos la calidad a la primera operando entregados-defectos*100/cantidadpedida  
-    $etequery3 = "SELECT COALESCE((SELECT SUM( entregados ) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today')/ (SELECT SUM(cantidad) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today'))*100 as calidad_primera";
+    $etequery2 = "SELECT  IFNULL(SUM( TIME_TO_SEC( breaktime)),0)+(SELECT IFNULL(SUM(TIME_TO_SEC(tiempo_muerto)),0) FROM tiempo_muerto WHERE id_maquina=$idmaquina AND fecha = '$today') AS tiempo_muerto  FROM breaktime WHERE id_maquina=$idmaquina AND radios='Sanitario' AND fechadeldiaam = '$today'";
     
+    //obtenemos la calidad a la primera operando entregados-defectos*100/cantidadpedida  
+    $etequery3 = "SELECT COALESCE((SELECT SUM( entregados ) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today')/ (SELECT SUM(cantidad) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today' AND tiempoTiraje IS NOT NULL))*100 as calidad_primera";
     //obtenemos desempeño operando entregados+merma
-    $etequery4 = "SELECT SUM(desempenio) AS desemp ,COUNT(desempenio) AS tirajes,SUM(produccion_esperada) AS esper FROM `tiraje` WHERE fechadeldia_tiraje='$today' AND id_maquina=$idmaquina";
-    $etequery5 = "SELECT COALESCE((SELECT SUM(entregados) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today')) as desempenio";
+    $etequery4 = "SELECT SUM(desempenio) AS desemp ,COUNT(desempenio) AS tirajes,SUM(produccion_esperada) AS esper FROM `tiraje` WHERE fechadeldia_tiraje='$today' AND id_maquina=$idmaquina AND tiempoTiraje IS NOT NULL";
+    $etequery5 = "SELECT COALESCE((SELECT SUM(entregados) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today' AND tiempoTiraje IS NOT NULL)) as desempenio";
     //obtenemos el elemento o producto
     $getelement = mysqli_fetch_assoc($resultado02_5);
     $element    = $getelement['producto'];
@@ -79,14 +81,8 @@ require('../saves/conexion.php');
         $seconds += pow(60, $key) * $value;
     }
     //obtenemos el estandar de piezas por hora para el elemento y proceso actual
-    if ($element!='') {
-      $standar_query2 = "SELECT * FROM estandares WHERE id_maquina=$idmaquina AND id_elemento= $element";
-    
-    $getstandar     = mysqli_fetch_assoc($mysqli->query($standar_query2));
-    $estandar       = $getstandar['piezas_por_hora'];
-    
-    
-    
+   
+  
     
     $getdeadTime = mysqli_fetch_assoc($mysqli->query($etequery2));
     $deadTime    = $getdeadTime['tiempo_muerto'];
@@ -99,29 +95,29 @@ require('../saves/conexion.php');
     $getdesemp= $mysqli->query($etequery4);
     $getEfec       = mysqli_fetch_assoc($getdesemp);
     //obtenemos el porcentaje de estandar segundos*estandar/1hora
-    $estandar_prod = ($seconds * $estandar) / 3600;
+   
     
     $desempenio =($getEfec['tirajes']>0)? ($getEfec['desemp']*100)/($getEfec['tirajes']*100) : 0;
     //echo $etequery3;
     //$realtime   = ($totalTime * 1) / 3600;
     
-    $dispon     = ($totalTime * 100) / $seconds;
+    $dispon     =($seconds>14400)? ($totalTime * 100) / ($seconds-3600) : ($totalTime * 100) / $seconds;
     //$disponible = round($dispon, 1);
     $disponible = round($dispon);
     
     $real       = mysqli_fetch_assoc($mysqli->query($etequery5));
+    $esperada       = mysqli_fetch_assoc($mysqli->query("SELECT COALESCE((SELECT SUM(produccion_esperada) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today')) as p_esperada"));
+    $merma       = mysqli_fetch_assoc($mysqli->query("SELECT COALESCE((SELECT SUM(merma_entregada) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today')) as merma"));
 
 
-    //echo "<p>dispon ".$dispon." calidad ".$Quality." desempeño ".$desempenio." prod esperada ".$getEfec['esper']." real ".$real['desempenio']." calidad ".$Quality." tiempo hasta ahora: ".$seconds."</p>";
-    
+    //echo "<p style='color:#fff;'>dispon ".$dispon." calidad ".$Quality." desempeño ".$desempenio." prod esperada ".$getEfec['esper']." real ".$real['desempenio']." calidad ".$Quality." tiempo hasta ahora: ".$seconds."</p>";
     $getEte     = (($dispon / 100) * ($Quality / 100) * ($desempenio / 100)) * 100;
-
-    $showpercent=100 - $getEte; }else{$getEte=0;}
+    $showpercent=100 - $getEte;
   /****************** Calcular ETE ******************/
           
 
     
-    $credencial='<div class="ete-photo"><div class="person-photo" style=background:url("../images/'.$photo.'.png")></div>
+    $credencial='<div class="ete-photo"><div class="person-photo" style=background:url("../images/'.$photo.'.jpg")></div>
     <div class="ete-num">'.round($getEte).'%</div>
     </div>
     <div class="ete-stat">
@@ -315,13 +311,13 @@ require('../saves/conexion.php');
 
 <div class="prod-container">
   <div class="personal">
-    <?=personalData(1,'Corte','4'); ?>
+    <?=personalData(21,'Serigrafia3','15'); ?>
   </div>
   <div class="personal">
-    <?=personalData(2,'Suaje','5'); ?>
+    <?=personalData(20,'Serigrafia2','10'); ?>
   </div>
   <div class="personal">
-    <?=personalData(10,'Serigrafia','6'); ?>
+    <?=personalData(10,'Serigrafia','12'); ?>
   </div>
   <div class="personal">
     <?=personalData(4,'Original','7'); ?>
@@ -330,7 +326,7 @@ require('../saves/conexion.php');
     <?=personalData(5,'Placa','8'); ?>
   </div>
   <div class="personal">
-    <?=personalData(6,'Laser','9'); ?>
+    <?=personalData(9,'Suaje','9'); ?>
   </div>
  
 </div>

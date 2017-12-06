@@ -1,5 +1,7 @@
  <?php
- ini_set("session.gc_maxlifetime","7200");  
+ ini_set('session.gc_maxlifetime', 30*60);
+ date_default_timezone_set("America/Mexico_City");
+
     if( !session_id() )
     {   
         session_start();
@@ -92,16 +94,15 @@
 
 <script >
     
-    if(history.length>0) {
-    //alert('Please use navigational links (Inbox, Cancel) instead of the browser back button.');
-    history.go(+1)
     
-}
 </script>
 
 <!--<script language="javascript" src="jquery-1.3.min.js"></script>-->
 <script language="javascript">// <![CDATA[
 $(document).ready(function() {
+  localStorage.removeItem('horaincio');
+        localStorage.removeItem('tiroactual');
+        localStorage.removeItem('segundosincio');
    // Esta primera parte crea un loader no es necesaria
     $().ajaxStart(function() {
         $('#loading').show();
@@ -134,7 +135,22 @@ $(document).ready(function() {
 }
 </script>
 
-
+<style>
+    #timer2 {
+    width: 470px;
+    background: #22242A;
+    height: 140px;
+    margin: 0 auto;
+    border-radius: 3px;
+    border: solid 2px #868686;
+}
+#timer2 span {
+    line-height: 140px;
+    font-size: 110px;
+    font-weight: bold;
+    color: #fff;
+}
+</style>
 
 
 
@@ -149,7 +165,7 @@ $(document).ready(function() {
    
 
   
-
+<div id="formulario" style="background: red;"></div>
 
 
 
@@ -184,13 +200,22 @@ $(document).ready(function() {
                                 <div class="timer-container">
                                     <div id="chronoExample">
                                     <div id="timer"><span class="values">00:00:00</span></div>
-                                    
+                                    <input type="hidden" id="ontime" name="ontime" value="true">
                                     <input type="hidden" id="timee" name="tiempo">
                                     
                                     
                                 </div>
                                 </div>
+
                                 
+                                    <div id="chronoExample2">
+                                    <div id="timer2"><span class="values">00:00:00</span></div>
+                                   
+                                    <input type="hidden" id="timee2" name="tiempo">
+                                   <input type="button" class="startButton" style="display: none;">
+                                    
+                       
+                                </div>
                             </div>
 
                           
@@ -199,7 +224,7 @@ $(document).ready(function() {
                         
                         <input hidden type="text" name="logged_in" id="logged_in" value="<?php echo "". $_SESSION['logged_in'] ?>" />
                         <input hidden name="tiempo" id="tiempo" />
-                        <input hidden type="text" name="horadeldia" id="horadeldia" value="<?php echo date("H:i:s",time()-25200); ?>" />
+                        <input hidden type="text" name="horadeldia" id="horadeldia" value="<?=date(" H:i:s", time()); ?>" />
                         <input hidden type="text" name="fechadeldia" id="fechadeldia" value="<?php echo date("d-m-Y"); ?>" />
 
                        
@@ -210,7 +235,7 @@ $(document).ready(function() {
                             <div class="row ">
                             <div class="center-input">
 
-<input type="text" name="mac"  id="mac" value="<?=$_SESSION['mac'] ?>"/>
+<input type="text" name="mac"  id="mac" value=""/>
                                <!--  
                             <input type="text" name="mac"  id="mac" value="<?=$_SESSION['nommaquina'] ?>"/>
                                 <div class="col-lg-5 col-sm-offset-3 col-sm-5  ">
@@ -242,6 +267,7 @@ $(document).ready(function() {
                         </div>
                     </div>
                 </form>
+
             </div>
         </div>
 
@@ -251,10 +277,13 @@ $(document).ready(function() {
 
 <script type="text/javascript">
  var timer = new Timer();
+ var timer2 = new Timer();
+ var deadTimer= new Timer();
 $(document).ready(function(){
-timer.start();
+timer.start({countdown: true, startValues: {seconds: 900}});
+saveOperstatus();
 });
-       
+$('#chronoExample2').hide();       
 
 $('#nuevo_registro').submit(function () {
     timer.pause();
@@ -265,18 +294,80 @@ $('#nuevo_registro').submit(function () {
     timer.stop();
 
 });*/
+
+     
+ function alerttime(){
+  animacion = function(){
+  
+  document.getElementById('formulario').classList.toggle('fade');
+}
+setInterval(animacion, 550);
+
+} 
 timer.addEventListener('secondsUpdated', function (e) {
     $('#chronoExample .values').html(timer.getTimeValues().toString());
 });
 timer.addEventListener('started', function (e) {
     $('#chronoExample .values').html(timer.getTimeValues().toString());
 });
-     
-     
+timer2.addEventListener('secondsUpdated', function (e) {
+    $('#chronoExample2 .values').html(timer2.getTimeValues().toString());
+});
+timer2.addEventListener('started', function (e) {
+    $('#chronoExample2 .values').html(timer2.getTimeValues().toString());
+});    
+deadTimer.addEventListener('secondsUpdated', function (e) {
+    $('#chronoExample .values').html(deadTimer.getTimeValues().toString());
+});
+  deadTimer.addEventListener('started', function (e) {
+      $('#chronoExample .values').html(deadTimer.getTimeValues().toString());
+  });  
+$('#chronoExample2 .startButton').click(function () {
+    timer2.start();
+    console.log('le picaron');
+});
+
+timer.addEventListener('targetAchieved', function (e) {
+    timer.stop();
+    deadTimer.start();
+    $('#ontime').val('false');
+    alerttime();
+   $.ajax({      
+                     type:"POST",
+                     url:"operstatus.php",   
+                     data:{section:'outtime'},  
+                       
+                     success:function(data){ 
+                          console.log(data);
+                     }  
+                });
+    
+    
+});
+
     function saveAsaichi(){
         timer.pause();
     $('#tiempo').val(timer.getTimeValues().toString());
+    var ontime=$('#ontime').val();
+
+if (ontime=='true') {
+        timer.pause();
+    $('#tiempo').val(timer.getTimeValues().toString());
+  }else{
+    deadTimer.pause();
+    $('#tiempo').val(deadTimer.getTimeValues().toString());
+  }
+
          var mac=$('#mac').val();
+         $.ajax({      
+                     type:"POST",
+                     url:"operstatus.php",   
+                     data:{section:'intime'},  
+                       
+                     success:function(data){ 
+                          console.log(data);
+                     }  
+                });
          $.ajax({  
                       
                      type:"POST",
@@ -287,11 +378,26 @@ timer.addEventListener('started', function (e) {
                        
                           //$('#update-form')[0].reset();  
                           //$('.close').click(); 
-                          window.location.replace("index2.php?mac="+mac);
+                          window.location.replace("index2.php");
                           console.log(data);
                      }  
                 });
-    }   
+    }
+
+    function saveOperstatus(){
+        
+    
+         $.ajax({  
+                      
+                     type:"POST",
+                     url:"operstatus.php",   
+                     data:{section:'asaichii'},  
+                       
+                     success:function(data){ 
+                          console.log(data);
+                     }  
+                });
+    }     
     </script>
      
     

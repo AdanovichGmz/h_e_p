@@ -1,6 +1,5 @@
 <?php
 require('../saves/conexion.php');
-//print_r($_POST);
 
 
 $orders=$_POST['orders'];
@@ -9,6 +8,7 @@ $process=$_POST['processes'];
 $proces_name=preg_replace('/\s+/', '', $_POST['process-name']);
 $orderids=$_POST['orderids'];
 $elems=$_POST['elems'];
+$odts=$_POST['odts'];
 $clean_query="DELETE FROM orden_estatus WHERE proceso_actual='$proces_name'";
   $clean=$mysqli->query($clean_query);
   $i=1;
@@ -16,17 +16,22 @@ $clean_query="DELETE FROM orden_estatus WHERE proceso_actual='$proces_name'";
 foreach ($orders as $order) {
   
   
-  
+   $idprocess=(isset($process[$order]))? $process[$order] :'none';
+   if ($idprocess!='none') {
     $id_orden=$orderids[$order];
-    $idprocess=$process[$order];
+    $numodt=$odts[$order];
     $status=$sorts[$order];
 
-     $upd_query="INSERT INTO orden_estatus(id_orden_status,id_orden,proceso_actual,id_proceso,status,orden_display)VALUES(null,$id_orden,'$proces_name',$idprocess,'$status',$i)";
+     $upd_query="INSERT INTO orden_estatus(id_orden_status,id_orden,numodt,proceso_actual,id_proceso,status,orden_display)VALUES(null,$id_orden,'$numodt','$proces_name',$idprocess,'$status',$i)";
      $inserted=$mysqli->query($upd_query);
      if (!$inserted) {
        printf($mysqli->error);
        echo $upd_query;
      }
+   }else{
+    continue;
+   }
+    
      
      $i++;
   
@@ -95,7 +100,7 @@ if ( $resultado) {
    </td>
    <td class="tabla"><input  type="text" class="sort" name="sort[<?=$i ;?>]" readonly="true" value="<?=$row['status'] ;?>" >
    <input  type="hidden" name="processes[<?=$i ;?>]" value="<?=$row['id_proceso'] ;?>">
-   <input  type="hidden" name="elems[<?=$i ;?>]" value="<?=$row['elemento'] ;?>"></td>
+   <input  type="hidden" name="elems[<?=$i ;?>]" value="<?=$row['elemento'] ;?>"><input  type="hidden" name="odts[<?=$i ;?>]" value="<?=$row['numodt'] ;?>"></td>
    
    
 

@@ -16,11 +16,9 @@ if(@$_SESSION['logged_in'] == true){
     <title></title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+   <link rel="stylesheet" href="css/bootstrap.min.css" />
+<link rel="stylesheet" href="css/bootstrap-theme.min.css" />
+<link rel="stylesheet" href="css/3.3.6/bootstrap.min.css" />
     <link href="css/estilos.css" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="style.css" />
@@ -45,6 +43,10 @@ if(@$_SESSION['logged_in'] == true){
     font-family: "monse-medium";
     }
     */
+    p{
+        color: red;
+        font-size: 20px;
+    }
 </style>
 
    
@@ -55,30 +57,33 @@ if(@$_SESSION['logged_in'] == true){
     <div class="container">
         <div class="login-box">
         <div class="login-inner">
-          <form  action="validar.php" method="post">
+          <form id="logg" action="validar.php" method="post">
         <div class="login-logo">
              <img src="images/logo-blanco.png" >
         </div>
-        <!--
-        <select name="maquina" required="true">
-        <option   disabled="true" selected="true" value="">Selecciona el area</option>
-            <option value="5c:f5:da:2f:33:5e">CORTE</option>
-            <option value="90:b9:31:ed:0f:6b">SUAJE</option>
-            <option value="34:e2:fd:dd:d0:7b">SERIGRAFIA</option>
-            <option value="b0:34:95:01:ec:2b">ACABADO</option>
-           
-        </select> -->
+        
+        
             <input id="usuario" name="usuario" type="text" placeholder="USUARIO" class="login-input" required="" />
             <input id="password" name="pass" type="password" placeholder="CONTRASEÑA" class="login-input" required="" />
-            <button id="singlebutton" value="login" name="singlebutton" class="login-button">ENTRAR</button>
+            <input type="button" id="singlebutton" value="ENTRAR" name="singlebutton" class="login-button">
             </form>
         </div>
             
         </div>
 
     </div> 
-    <script type="text/javascript">load();</script>
+   
     <script src="./jquery-1.11.2.min.js"></script>
 </body>
+<script type="text/javascript">
+    $(document).ready(function(event) {
+        $( "#singlebutton").click(function() {
+                                          
+                                                      
+             $( "#logg" ).submit();                                      
+                                             
+    });
+    });
+</script>
 </html>
 <?php } ?>

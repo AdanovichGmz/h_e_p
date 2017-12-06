@@ -374,7 +374,8 @@ $(".sort").each(function() {
                           //$('#update-form')[0].reset();  
                           //$('.close').click(); 
                           $('#newstandar').prop("disabled", true).addClass('disabled'); 
-                          $('.div-tabla').html(data).show().fadeIn(3000);  
+                          $('.div-tabla').html(data).show().fadeIn(3000); 
+                          console.log(data); 
                           
                      }  
                 }); 

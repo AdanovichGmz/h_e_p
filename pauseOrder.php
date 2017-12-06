@@ -1,24 +1,24 @@
 <?php 
 require('saves/conexion.php');
-
-$idorden=$_POST['id_orden'];
-$proceso=$_POST['proceso'];
+print_r($_POST);
+$idorden=(isset($_POST['id_orden']))? $_POST['id_orden'] : '';
+$proceso=(isset($_POST['proceso']))? $_POST['proceso'] : '';
 $action=(isset($_POST['action']))? $_POST['action'] : '';
 $tpausa=(isset($_POST['tpausa']))? $_POST['tpausa'] : '';
-$cantrecib=$_POST['cantrecib'];
-$cantpedido=$_POST['cantpedido'];
-$merma=$_POST['merma'];
-$buenos=$_POST['buenos'];
-$ajuste=$_POST['ajuste'];
-$defectos=$_POST['defectos'];
-$entregados=$_POST['entregados'];
-$mermaent=$_POST['mermaent'];
-$fecha=$_POST['fecha'];
-$hora=$_POST['hora'];
-$producto=$_POST['producto'];
+$cantrecib=(isset($_POST['cantrecib']))? $_POST['cantrecib'] : '';
+$cantpedido=(isset($_POST['cantpedido']))? $_POST['cantpedido'] : '';
+$merma=(isset($_POST['merma']))? $_POST['merma'] : '' ;
+$buenos=(isset($_POST['buenos']))? $_POST['buenos'] : '' ;
+$ajuste=(isset($_POST['ajuste']))? $_POST['ajuste'] : '' ;
+$defectos=(isset($_POST['defectos']))? $_POST['defectos'] : '' ;
+$entregados=(isset($_POST['entregados']))? $_POST['entregados'] : '' ;
+$mermaent=(isset($_POST['mermaent']))? $_POST['mermaent'] : '';
+$fecha=(isset($_POST['fecha']))? $_POST['fecha'] : '';
+$hora=(isset($_POST['hora']))? $_POST['hora'] : '';
+$producto=(isset($_POST['producto']))? $_POST['producto'] : '';
 
 if ($action=='exit') {
-	$query="UPDATE procesos SET avance=3 WHERE id_orden=$idorden AND proceso='$proceso'";
+	$query="UPDATE procesos SET avance=3 WHERE id_orden=$idorden AND id_proceso='$proceso'";
 $paused=$mysqli->query($query);
 if ($paused) {
 	echo "Cerrando Sesion";

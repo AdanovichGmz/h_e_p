@@ -13,6 +13,7 @@ switch ($_SESSION['mac']){
        $options[]= 'Faltante de Papel';
        $options[]= 'Papel Incorrecto' ;
        $options[]= 'Papel Impreso mal Registrado' ;
+       $options[]= 'Otro';
         break;
 
 
@@ -27,6 +28,7 @@ switch ($_SESSION['mac']){
        $options[]= 'Se Movio el Registro';
        $options[]= 'Es Bolsa' ;
        $options[]= 'Fallo de la Maquina' ;
+       $options[]= 'Otro';
     //echo $nommaquina;
         break;
   case '2c:f0:ee:3d:53:99':
@@ -35,6 +37,7 @@ switch ($_SESSION['mac']){
        $options[]= 'Se Movio el Registro';
        $options[]= 'Es Bolsa' ;
        $options[]= 'Fallo de la Maquina' ;
+       $options[]= 'Otro';
        //$options5= 'Falta Matrix' ;
         break;
   case 'f0:db:f8:11:97:bc':
@@ -43,6 +46,7 @@ switch ($_SESSION['mac']){
        $options[]= 'Fallo de Maquina';
        $options[]= 'Se Movio el Registro' ;
        $options[]= 'Tamaño Incorrecto de la Placa' ;
+       $options[]= 'Otro';
        
     //de aqui para abajo no los llene aun
         break;
@@ -53,6 +57,7 @@ switch ($_SESSION['mac']){
        $options[]= 'Falta Placa' ;
        $options[]= 'Falta Albanene' ;
        $options[]= 'Falta Pelicula';
+       $options[]= 'Otro';
     //echo $nommaquina;
         break;
   case 'b0:34:95:01:ec:2b':
@@ -61,6 +66,7 @@ switch ($_SESSION['mac']){
        $options[]= 'Fallo de Maquina';
        $options[]= 'Mal Ajuste' ;
        $options[]= 'Basura en la Area' ;
+       $options[]= 'Otro';
        
     //echo $nommaquina;
         break;
@@ -72,6 +78,8 @@ switch ($_SESSION['mac']){
        $options[]= 'Material Incompleto' ;
        $options[]= 'Ajuste de Maquina';
        $options[]= 'Laminas en Mal Estado';
+       $options[]= 'Otro';
+
      //echo $nommaquina;
         break;
   case 'Placa':
@@ -80,6 +88,7 @@ switch ($_SESSION['mac']){
        $options[]='ODT Faltante' ;
        $options[]= 'Falta Albanene';
        $options[]= 'Material Incompleto' ;
+       $options[]= 'Otro';
             
 
      //echo $nommaquina;
@@ -89,6 +98,7 @@ switch ($_SESSION['mac']){
         $options[]='Papel maltratado';
        $options[]='Tirar basura' ;
        $options[]= 'Papel mal registrado';
+       $options[]= 'Otro';
        
      //echo $nommaquina;
         break;

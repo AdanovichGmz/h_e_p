@@ -20,12 +20,17 @@ if(@$_SESSION['logged_in'] != true){
      <?php
      require('../saves/conexion.php');
         function getProcess($id){
-         require('../saves/conexion.php');
+          if (!empty($id)) {
+            require('../saves/conexion.php');
         $maq_query="SELECT nommaquina FROM maquina WHERE idmaquina=$id";
         
         $getmaq=mysqli_fetch_assoc($mysqli->query($maq_query));
         $maq=$getmaq['nommaquina'];
         return $maq;
+          }else{
+            return '';
+          }
+        
       }
       function getElement($id){
          require('../saves/conexion.php');

@@ -23,6 +23,53 @@
   src:  url('../fonts/ahronbd.ttf');
  
 }
+#elementerror{
+    color: red;
+    font-family: 'monse-bold';
+    font-size: 25px;
+
+}
+.odtsearch{
+    width: 100%;
+    height: 97px;
+    border-bottom:1px solid #D2D3D5;
+
+
+}
+
+.odtsearch input{
+    width: 30%;
+    font-size: 25px;
+    padding: 10px;
+    text-align: center;
+    border-radius: 4px;
+    border:1px solid #D2D3D5;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+#odtresult{
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+
+}
+ .boxorder{
+  position:absolute;
+      top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      width:70%;
+      background:#ffffff;
+      z-index:51;
+      padding:10px;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+      -moz-box-shadow:0px 0px 5px #444444;
+      -webkit-box-shadow:0px 0px 5px #444444;
+      box-shadow:0px 0px 5px #444444;
+      display:none;
+ }
 
 .confirmbutton{
     width: 160px;
@@ -68,6 +115,21 @@
     font-weight: bold;
     color: #CECECE;
 }
+#timersmall2{
+    width: 440px;
+    background: #343434;
+    height: 110px;
+    margin-left: 15px !important;
+    border-radius: 3px;
+    border: solid 1px #5C5C5C;
+    display: inline-block;
+}
+#timersmall2 span{
+    line-height: 110px;
+    font-size: 100px;
+    font-weight: bold;
+    color: #CECECE;
+}
 #recibidos{
     width: 30%; display: inline-block;
 }
@@ -98,7 +160,7 @@ body {
     text-align: center!important;
 }
 .modal-content{
-    background-color:#EDF7F9 !important;
+    background:#EDF7F9 !important;
 }
 .watch-container{
     width: 100%; text-align: center; position: relative; height:200px;
@@ -197,6 +259,9 @@ box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.61);
 .reloj-container2{
     width: 500px; margin: 0 auto; position:relative; height: 170px;
 }
+.reloj-container3{
+    width: 100%; margin: 0 auto; position:relative; height: 170px;
+}
 .square-button{
     width: 150px;
     height: 150px;
@@ -214,7 +279,7 @@ box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.31);
 
 .square-button img{
     position: absolute;
-    width: 60%;
+    width: 70%;
      top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -356,7 +421,64 @@ box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.31);
 -moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.61);
 box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.61);
 }
+.square-button-micro{
+    width: 80px;
+    height: 80px;
+    background: black;
+    display: block;
+ display: inline-block;
+    margin:5px;
+    border-radius: 3px;
+    cursor: pointer;
+    position: absolute;
+    right: 15px;
+    top:3px;
+    -webkit-box-shadow: 2px 2px 3px 0px rgba(50, 50, 50, 0.31);
+-moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.31);
+box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.31);
+}
 
+.square-button-micro img{
+    position: absolute;
+    width: 60%;
+     top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+.square-button-micro2{
+    width: 110px;
+    height: 110px;
+    background: black;
+    display: block;
+ display: inline-block;
+    margin:0 5px;
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    -webkit-box-shadow: 2px 2px 3px 0px rgba(50, 50, 50, 0.31);
+-moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.31);
+box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.31);
+}
+
+.square-button-micro2 img{
+    position: absolute;
+    width: 60%;
+     top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+.square-button-micro2:hover{
+    -webkit-box-shadow: 2px 2px 3px 0px rgba(50, 50, 50, 0.61);
+-moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.61);
+box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.61);
+}
+.square-button-micro:hover{
+    -webkit-box-shadow: 2px 2px 3px 0px rgba(50, 50, 50, 0.61);
+-moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.61);
+box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.61);
+}
 .square-button-text,.square-button-text2{
     width: 120px;
     height: 80px;
@@ -492,14 +614,41 @@ box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.61);
      margin-bottom:10px !important;
     cursor: pointer;
     position: relative;
+    /*
     -webkit-box-shadow: 2px 2px 3px 0px rgba(50, 50, 50, 0.31);
     -moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.31);
     box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.31);
+    */
     text-align: center;
-    font-weight: bold;
-    line-height: 65px;
-    color:#fff;
+    
     display:inline-block;
+}
+.radio-menu-small2{
+    width: 150px;
+    height: 80px;
+    border-radius: 3px;
+     margin-bottom:10px !important;
+    cursor: pointer;
+    position: relative;
+    /*
+    -webkit-box-shadow: 2px 2px 3px 0px rgba(50, 50, 50, 0.31);
+    -moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.31);
+    box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.31);
+    */
+    text-align: center;
+    background: #005076!important;
+    
+    display:inline-block;
+}
+.elem{
+
+    font-weight: bold;
+    line-height: 25px!important;
+    color:#fff;
+    position: absolute;
+     top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
 }
 .radio-menu-small input{
     display: none;
@@ -519,6 +668,13 @@ background:#3C752B;
 }
 .product{
     color: #305E24; position: absolute; top: 44px; font-size: 12px;left: 50%;
+    transform: translate(-50%, 0);
+    line-height: 14px;
+    font-weight: bold;
+    width: 140px;
+}
+.suborder{
+    color: #4b94ce; position: absolute; top: 48px; font-size: 25px;left: 50%;
     transform: translate(-50%, 0);
     line-height: 14px;
     font-weight: bold;

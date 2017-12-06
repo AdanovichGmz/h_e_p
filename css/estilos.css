@@ -33,11 +33,13 @@ body {
      ;
 
 }
-
+#singlebutton{
+    margin-bottom: 15px;
+}
 
 .login-box{
     width:550px;
-    height: 450px;
+    min-height: 440px;
     margin: 0 auto;
     background: #002D62;
     border: none;

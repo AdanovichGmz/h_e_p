@@ -3,9 +3,7 @@
 require('saves/conexion.php');
 $csv = array();
 $lines = file('elementostoid.csv', FILE_IGNORE_NEW_LINES);
-
 foreach ($lines as $key => $value)
-
 {   
     $nelem=str_getcsv($value);
     $getidquery="SELECT id_elemento FROM elementos WHERE nombre_elemento='$value' ";
@@ -27,22 +25,20 @@ foreach ($lines as $key => $value)
     elseif ($value=='Hojas Interiores') {
        $id=140;
     }
+    elseif ($value=='Hojas interiores') {
+       $id=140;
+    }
     if ($id==null) {
         $faltantes[]=$value;
     }
-    $csv[] = $id;
+    $csv[$key]['id'] =($id==null)? 143 : $id;
+    $csv[$key]['nombre'] = $value;
 }
-
-echo '<pre>';
-print_r(array_unique($faltantes));
-echo '</pre>';
 $falt=array_unique($faltantes);
-/*
+
 echo '<pre>';
 print_r($csv);
-echo '</pre>';
-
-
+echo '</pre>';/*
 $fp = fopen('php://output', 'w');
 foreach ( $data as $line ) {
     $val = explode(",", $line);
@@ -52,8 +48,8 @@ fclose($fp);
 */
 $fp = fopen('output.csv', 'w');
 foreach ( $csv as $line ) {
-    $val = explode(",", $line);
-    fputcsv($fp, $val);
+    
+    fputcsv($fp, $line);
 }
 fclose($fp);
 $fp2 = fopen('faltantes.csv', 'w');
@@ -62,5 +58,4 @@ foreach ( $falt as $line ) {
     fputcsv($fp2, $val);
 }
 fclose($fp2);
-
 ?>

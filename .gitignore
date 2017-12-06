@@ -1,2 +1,8 @@
 images/
 img/
+logs/
+saves/conexion.php
+validar.php
+
+logs/*
+*.txt

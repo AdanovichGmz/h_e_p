@@ -1,6 +1,6 @@
 ﻿
                                    function createChart() {
-                                       $("#graficajs").kendoChart({
+                                       jQuery1102("#graficajs").kendoChart({
                                            title: {
                                                position: "bottom",
                                                text: ""
@@ -40,5 +40,5 @@
                                        });
                                    }
 
-$(document).ready(createChart);
-$(document).bind("kendo:skinChange", createChart);
+jQuery1102(document).ready(createChart);
+jQuery1102(document).bind("kendo:skinChange", createChart);

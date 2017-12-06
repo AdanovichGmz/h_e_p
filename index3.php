@@ -1,14 +1,9 @@
 
 <?php
-ini_set("session.gc_maxlifetime","7200");  
+error_reporting(0);
+ini_set('session.gc_maxlifetime', 30*60);
 date_default_timezone_set("America/Mexico_City");
-if (isset($_COOKIE['ajuste'])) {
-    setcookie('ajuste', true, time() - 3600);
-    unset($_COOKIE['ajuste']);
-}
-if (!isset($_COOKIE['tiraje'])) {
-    setcookie('tiraje', true, time() + 3600);
-}
+
 require('saves/conexion.php');
 if (!session_id()) {
     session_start();
@@ -16,7 +11,7 @@ if (!session_id()) {
 if (@$_SESSION['logged_in'] != true) {
     echo '
     <script>
-        alert("tu no estas autorizado para entrar a esta pagina");
+        alert("No has iniciado sesion");
         self.location.replace("index.php");
     </script>';
 } else {
@@ -59,12 +54,19 @@ if (@$_SESSION['logged_in'] != true) {
             $retakingTiro       = mysqli_fetch_assoc($mysqli->query($getretakingTiro));
             $horaAjuste     = $retakingTiro['horadeldia_ajuste'];
         }else{
+             $process=($machineName=='Serigrafia2'||$machineName=='Serigrafia3')?'Serigrafia':(($machineName=='Suaje2')? 'Suaje' : $machineName );
+             $processID=($machineID==20||$machineID==21)? 10:(($machineID==22)? 9 : $machineID );
+             $getid="SELECT * FROM personal_process WHERE status='actual' AND proceso_actual='$machineName'";
+              $id=mysqli_fetch_assoc($mysqli->query($getid));
+            
 
-            $orderID = explode(",", $_GET['order']);
-           
+            $orderID = (isset($_GET['order']))? explode(",", $_GET['order'] ) : explode(",", $id['id_orden']);
+            $idtiro=$id['last_tiraje'];
+           $today=date("d-m-Y");
             $singleID=$orderID[0];
             $userID      = $_SESSION['id'];
-            $getAjuste    = "SELECT horadeldia_ajuste FROM tiraje WHERE id_orden=$singleID AND id_maquina=$machineID";
+            $getAjuste    = "SELECT horadeldia_ajuste,elemento_virtual,TIME_TO_SEC(horadeldia_tiraje) AS iniciotiro FROM tiraje WHERE idtiraje=$idtiro";
+
             $Ajuste       = mysqli_fetch_assoc($mysqli->query($getAjuste));
             $horaAjuste     = $Ajuste['horadeldia_ajuste'];
             foreach ($orderID as $order) {
@@ -73,6 +75,7 @@ if (@$_SESSION['logged_in'] != true) {
             $odetesArr[]=$odt['numodt'];
             }
             $odetes=implode(",", $odetesArr);
+            
 
         }
 
@@ -80,31 +83,31 @@ if (@$_SESSION['logged_in'] != true) {
     
     
     $_GET['mivariable'] = $machineName;
-    $query0             = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$machineName' HAVING status='actual'";
+    $query0             = "SELECT o.*,p.proceso,p.id_proceso,pp.* FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden INNER JOIN personal_process pp ON pp.id_orden=o.idorden WHERE proceso_actual='$machineName' AND nombre_proceso='$process' AND status='actual'";
     
     $resultado0 = $mysqli->query($query0);
     
-    $query01 = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$machineName' HAVING status='actual'";
-    
+    $query01 = "SELECT o.*,p.proceso,p.id_proceso,pp.* FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden INNER JOIN personal_process pp ON pp.id_orden=o.idorden WHERE proceso_actual='$machineName' AND nombre_proceso='$process' AND status='actual'";
+   
     $resultado01 = $mysqli->query($query01);
     
     
-    $query02 = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$machineName' HAVING status='actual' ";
+    $query02 = "SELECT o.*,p.proceso,p.id_proceso,pp.orden_display,pp.status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden INNER JOIN personal_process pp ON pp.id_orden=o.idorden WHERE proceso_actual='$machineName' AND status='actual'";
     
     $resultado02   = $mysqli->query($query02);
     $resultado02_5 = $mysqli->query($query02);
     
     
-    $query1 = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$machineName' HAVING status='actual'";
+    $query1 = "SELECT o.*,p.proceso,p.id_proceso,pp.*,(SELECT nombre_elemento FROM elementos WHERE id_elemento=o.producto) AS nombre_elemento FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden INNER JOIN personal_process pp ON pp.id_orden=o.idorden WHERE proceso_actual='$machineName' AND nombre_proceso='$process' AND status='actual'";
     
     $resultado1 = $mysqli->query($query1);
     
     
-    $query2 = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$machineName' HAVING status='siguiente' ";
+    $query2 = "SELECT o.*,p.proceso,p.id_proceso,pp.* FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden INNER JOIN personal_process pp ON pp.id_orden=o.idorden WHERE proceso_actual='$machineName' AND nombre_proceso='$process' AND status='siguiente'";
     
     $resultado2 = $mysqli->query($query2);
     
-    $query3 = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$machineName' HAVING status='preparacion'";
+    $query3 = "SELECT o.*,p.proceso,p.id_proceso,pp.* FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden INNER JOIN personal_process pp ON pp.id_orden=o.idorden WHERE proceso_actual='$machineName' AND nombre_proceso='$process' AND status='preparacion'";
     
     $resultado3 = $mysqli->query($query3);
 ?>
@@ -118,18 +121,23 @@ if (@$_SESSION['logged_in'] != true) {
     <?php
     $today     = date("d-m-Y");
     //obtenemos el tiempo real sumando tiempoTiraje + tiempo_ajuste +tiempoalertamaquina + tiempoajuste
-    $etequery1 = "SELECT COALESCE((SELECT  IFNULL(SUM( TIME_TO_SEC( tiempoTiraje) ),0)  FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')+(SELECT  IFNULL(SUM( TIME_TO_SEC( tiempo_ajuste)),0) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_ajuste = '$today')+(SELECT  IFNULL(SUM( TIME_TO_SEC( tiempoalertamaquina) ),0)  FROM alertamaquinaoperacion WHERE id_maquina=$machineID AND fechadeldiaam = '$today') + (SELECT  IFNULL(SUM( TIME_TO_SEC(tiempoalertamaquina) ),0) FROM alertageneralajuste WHERE id_maquina=$machineID AND fechadeldiaam = '$today')) as tiempo_real";
+    $etequery1 = "SELECT COALESCE((SELECT  IFNULL(SUM( TIME_TO_SEC( tiempoTiraje) ),0)  FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today' )+(SELECT  IFNULL(SUM( TIME_TO_SEC( tiempo_ajuste)),0) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_ajuste = '$today' )) as tiempo_real";
     //obtenemos el tiempo muerto sumando las idas al sanitario
-    $etequery2 = "SELECT  IFNULL(SUM( TIME_TO_SEC( breaktime) ),0) AS tiempo_muerto  FROM breaktime WHERE id_maquina=$machineID AND radios='Sanitario' AND fechadeldiaam = '$today'";
+    $etequery2 = "SELECT  IFNULL(SUM( TIME_TO_SEC( breaktime)),0)+(SELECT IFNULL(SUM(TIME_TO_SEC(tiempo_muerto)),0) FROM tiempo_muerto WHERE id_maquina=$machineID AND fecha = '$today') AS tiempo_muerto  FROM breaktime WHERE id_maquina=$machineID AND radios='Sanitario' AND fechadeldiaam = '$today'";
+    $tmuerto_alertas=mysqli_fetch_assoc($mysqli->query("SELECT (SELECT  IFNULL(SUM( TIME_TO_SEC( tiempoalertamaquina) ),0)  FROM alertamaquinaoperacion WHERE id_maquina=$machineID AND fechadeldiaam = '$today' AND es_tiempo_muerto NOT IN('false')) + (SELECT  IFNULL(SUM( TIME_TO_SEC(tiempoalertamaquina) ),0) FROM alertageneralajuste WHERE id_maquina=$machineID AND fechadeldiaam = '$today' AND es_tiempo_muerto NOT IN('false')) AS tmuerto_alert"));
+   
+  
+    
     //obtenemos la calidad a la primera operando entregados-defectos*100/cantidadpedida  
-    $etequery3 = "SELECT COALESCE((SELECT SUM( entregados ) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')/ (SELECT SUM(cantidad) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today'))*100 as calidad_primera";
+    $etequery3 = "SELECT COALESCE(((SELECT SUM(entregados)-SUM(merma_entregada) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')-(SELECT SUM(defectos) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today' AND tiempoTiraje IS NOT NULL))/(SELECT SUM(entregados)-SUM(merma_entregada) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today'))*100 as calidad_primera";
     //obtenemos desempeño operando entregados+merma
-    $etequery4 = "SELECT SUM(desempenio) AS desemp ,COUNT(desempenio) AS tirajes,SUM(produccion_esperada) AS esper FROM `tiraje` WHERE fechadeldia_tiraje='$today' AND id_maquina=$machineID";
-    $etequery5 = "SELECT COALESCE((SELECT SUM(entregados) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today')) as desempenio";
+    $etequery4 = "SELECT SUM(produccion_esperada) AS prod_esperada, SUM(buenos) AS prod_real  ,COUNT(desempenio) AS tirajes,SUM(produccion_esperada) AS esper FROM `tiraje` WHERE fechadeldia_tiraje='$today' AND id_maquina=$machineID AND tiempoTiraje IS NOT NULL";
+    $etequery5 = "SELECT COALESCE((SELECT SUM(entregados) FROM tiraje WHERE id_maquina=$machineID AND fechadeldia_tiraje = '$today' AND tiempoTiraje IS NOT NULL)) as desempenio";
     //obtenemos el elemento o producto
     $getelement = mysqli_fetch_assoc($resultado02_5);
-    $element    = $getelement['producto'];
-    $begin      = new DateTime('09:00');
+
+    $element    =($getelement['is_virtual']=='true')? $getelement['id_elem_virtual'] : $getelement['producto'];
+    $begin      = new DateTime('08:45');
     $current    = new DateTime(date('H:i'));
     //obtenemos el tiempo transcurrido desde el inicio del dia hasta el momento actual
     $interval   = $begin->diff($current);
@@ -143,17 +151,17 @@ if (@$_SESSION['logged_in'] != true) {
         $seconds += pow(60, $key) * $value;
     }
     //obtenemos el estandar de piezas por hora para el elemento y proceso actual
-    $standar_query2 = "SELECT * FROM estandares WHERE id_maquina=$machineID AND id_elemento= $element";
+    $standar_query2 = "SELECT * FROM estandares WHERE id_maquina=$processID AND id_elemento= $element";
     
     $getstandar     = mysqli_fetch_assoc($mysqli->query($standar_query2));
     $estandar       = $getstandar['piezas_por_hora'];
     
     
     $getdeadTime = mysqli_fetch_assoc($mysqli->query($etequery2));
-    $deadTime    = $getdeadTime['tiempo_muerto'];
+    $deadTime    = $getdeadTime['tiempo_muerto']+$tmuerto_alertas['tmuerto_alert'];
     
     $gettotalTime = mysqli_fetch_assoc($mysqli->query($etequery1));
-    $totalTime    = $gettotalTime['tiempo_real'] - $getdeadTime['tiempo_muerto'];
+    $totalTime    = $gettotalTime['tiempo_real'];
     
     $getQuality = mysqli_fetch_assoc($mysqli->query($etequery3));
     $Quality    = $getQuality['calidad_primera'];
@@ -162,19 +170,20 @@ if (@$_SESSION['logged_in'] != true) {
     //obtenemos el porcentaje de estandar segundos*estandar/1hora
     $estandar_prod = (($seconds-3600) * $estandar) / 3600;
     
-    $desempenio =($getEfec['tirajes']>0)? ($getEfec['desemp']*100)/($getEfec['tirajes']*100) : 0;
+    $desempenio =($getEfec['prod_real']/$getEfec['prod_esperada'])*100;
     //echo $etequery3;
     //$realtime   = ($totalTime * 1) / 3600;
-    
-    $dispon     =($seconds>14400)? ($totalTime * 100) / ($seconds-3600) : ($totalTime * 100) / $seconds;
+    $roundDesemp=($desempenio>100)? 100 : $desempenio;
+    $dispon     =($seconds>19800)? ($totalTime / ($seconds-3600))*100 : ($totalTime / $seconds)*100;
     //$disponible = round($dispon, 1);
     $disponible = round($dispon);
     
     $real       = mysqli_fetch_assoc($mysqli->query($etequery5));
-
+   
 
     //echo "<p style='color:#fff;'>dispon ".$dispon." calidad ".$Quality." desempeño ".$desempenio." prod esperada ".$getEfec['esper']." real ".$real['desempenio']." calidad ".$Quality." tiempo hasta ahora: ".$seconds."</p>";
-    $getEte     = (($dispon / 100) * ($Quality / 100) * ($desempenio / 100)) * 100;
+    $roundQuality=($Quality>100)? 100 : $Quality;
+    $getEte     = (($dispon / 100) * ($roundQuality / 100) * ($roundDesemp / 100)) * 100;
     $showpercent=100 - $getEte;
     
 ?>
@@ -217,9 +226,9 @@ if (@$_SESSION['logged_in'] != true) {
       var data = google.visualization.arrayToDataTable([
           ['valor', 'porcentaje'],
          <?php
-    echo "['DISPONIBILIDAD'," . $dispon . "],";
-    echo "['DESEMPEÑO'," . $desempenio  . "],";
-    echo "['CALIDAD'," . $Quality . "],";
+    echo "['DISPONIBILIDAD'," .round($dispon,2)  . "],";
+    echo "['DESEMPEÑO'," . round($roundDesemp,2)  . "],";
+    echo "['CALIDAD'," . round($roundQuality,2) . "],";
     
 ?> ]);
         var options = { // api de google chats, son estilos css puestos desde js
@@ -258,27 +267,35 @@ if (@$_SESSION['logged_in'] != true) {
     echo $machineName;
 ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous" />
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    
     <!-- reloj -->   
     <link href="compiled/flipclock.css" rel="stylesheet" />
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+     <script src="js/libs/jquery.min.js"></script>
+     
+<script src="js/libs/kendo.all.min.js"></script>
     <script src="compiled/flipclock.js"></script>
     <script src="js/easytimer.min.js"></script>
-    <link rel="stylesheet" href="//kendo.cdn.telerik.com/2016.3.914/styles/kendo.common-material.min.css" />
-    <link rel="stylesheet" href="//kendo.cdn.telerik.com/2016.3.914/styles/kendo.material.min.css" />
-    <link rel="stylesheet" href="//kendo.cdn.telerik.com/2016.3.914/styles/kendo.material.mobile.min.css" />
+     <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css" />
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="js/libs/bootstrap.min.js"></script>
+  
+      <link href="css/general-styles.css" rel="stylesheet" />
+    <!-- LOADER -->
+    <link rel="stylesheet" href="css/normalize.min.css">
+<link rel="stylesheet" href="css/kendo.common-material.min.css" />
+    <link rel="stylesheet" href="css/kendo.material.min.css" />
+    <link rel="stylesheet" href="css/kendo.material.mobile.min.css" />
+<link rel="stylesheet" href="css/3.3.6/bootstrap.min.css" />
 
-    <script src="//kendo.cdn.telerik.com/2016.3.914/js/kendo.all.min.js"></script>
+    
   <link href="css/corte.css" rel="stylesheet" />
     <link href="css/estiloshome.css" rel="stylesheet" />
     <link href="css/general-styles.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="js/jsGrafica.js"></script>
-    <script src="js/graficabarras.js"></script>
-    <script src="js/divdespegable.js"></script>
+   
+   
+   
    
     <script src="js/test.js"></script>
     
@@ -287,8 +304,8 @@ if (@$_SESSION['logged_in'] != true) {
     <script language="javascript">// <![CDATA[
 
 // ]]></script>
-
-
+ 
+<link rel="stylesheet" href="css/softkeys-0.0.1.css">
 <script language="javascript">
          function limpiar() {
            setTimeout('document.fo3.reset()',20);
@@ -298,6 +315,9 @@ if (@$_SESSION['logged_in'] != true) {
 </script> 
 
 <style type="text/css">
+.prple img{
+  width: 80%!important;
+}
   #cantpedido{
     width: 170px;
     height: 82px;
@@ -422,9 +442,7 @@ if (@$_SESSION['logged_in'] != true) {
 
 </head>
 <body style="">
-<input type="hidden" id="display-ete" value="<?php
-    echo "getete " . $getEte . " dispon " . $dispon . " quality " . $Quality . " efec " . $desempenio;
-?>">
+<input type="hidden" id="iniciotiro" value="<?=$Ajuste['iniciotiro'] ?>">
 <input type='hidden' id='pausedorder' value="<?= (isset($secondspaused)) ? $secondspaused : 'false' ?>">
  
   <?php
@@ -450,21 +468,21 @@ if (@$_SESSION['logged_in'] != true) {
 <div class="contegral">
    
       <ul>
-  <li> <div id="divPHOTO" class="user-photo"></div></li>
-  <li><span><?php
+  <!-- <li> <div id="divPHOTO" class="user-photo"></div></li> -->
+  <li><span style="color: #CECECE; font-size:20px;"><?php
     echo "Bienvenido: " . $_SESSION['logged_in'];
 ?></span></li>
-  <li><span>Area: <?php
+  <li><span style="color: #CECECE; font-size:20px;">Area: <?php
     echo $machineName;
 ?></span></li>
 
-           
+    <input type="hidden" id="realtime">
+    <input type="hidden" id="mach" value="<?=$machineID ?>"> 
+     <input type="hidden" id="el" value="<?=$element ?>">         
   <li style="float:right"></li>
-   <li style="float:right"><span id="hora" >Produccion esperada: 12</span></li>
-    <li style="float:right ;display:none;"><span><?php
-    $fecha = strftime("%Y-%m-%d", time());
-    echo $fecha;
-?></span></li>
+   <li style="float:right"><span id="hora" ></span></li>
+    <li style="float:right ;" id="avancerealtime"><?php include 'avance.php';
+?></li>
               
 </ul>
         
@@ -486,11 +504,10 @@ if (@$_SESSION['logged_in'] != true) {
    
      } else{
         if ($row = mysqli_fetch_object($resultado1)) {
-        $prodact       = $row->producto;
-        $element_query = "SELECT nombre_elemento FROM elementos WHERE id_elemento=$prodact";
-        $get_elem      = mysqli_fetch_assoc($mysqli->query($element_query));
-        $actelement    = $get_elem['nombre_elemento'];
-        echo $row->numodt . " <span style='color:#2FE3BF'>" . $actelement . "</span>";
+        
+        $actelement    = $row->nombre_elemento;
+        $size=(strlen($actelement)>17)?'font-size: 17px;':'';
+        echo $row->numodt . " <span style='color:#2FE3BF; ".$size."'>" . $actelement . "</span>";
     } else {
         echo "--";
     }
@@ -514,9 +531,16 @@ if (@$_SESSION['logged_in'] != true) {
         $sigelement_query = "SELECT nombre_elemento FROM elementos WHERE id_elemento=$prodsig";
         $get_sigelem      = mysqli_fetch_assoc($mysqli->query($sigelement_query));
         $sigelement       = $get_sigelem['nombre_elemento'];
-        echo $row2->numodt . " <span style='color:#2FE3BF'>" . $sigelement . "</span>";
+        $size=(strlen($sigelement)>17)?'font-size: 17px;':'';
+        echo $row2->numodt . " <span style='color:#2FE3BF;".$size."'>" . $sigelement . "</span>";
     } else {
-        echo "--";
+        $sigquery=$mysqli->query("SELECT * FROM odt_flujo WHERE status='siguiente' AND proceso='$machineName'");
+        if ($rowsig = mysqli_fetch_object($sigquery)) {
+            echo $rowsig->numodt;
+        }else{
+          echo "--";  
+        }
+        
     }
 ?>
    </td>
@@ -537,9 +561,16 @@ if (@$_SESSION['logged_in'] != true) {
         $prepelement_query = "SELECT nombre_elemento FROM elementos WHERE id_elemento=$prodprep";
         $get_prepelem      = mysqli_fetch_assoc($mysqli->query($prepelement_query));
         $prepelement       = $get_prepelem['nombre_elemento'];
-        echo $row3->numodt . " <span style='color:#2FE3BF'>" . $prepelement . "</span>";
+        $size=(strlen($prepelement)>17)?'font-size: 17px;':'';
+        echo $row3->numodt . " <span style='color:#2FE3BF; ".$size."'>" . $prepelement . "</span>";
     } else {
-        echo "--";
+        $prepquery=$mysqli->query("SELECT * FROM odt_flujo WHERE status='preparacion' AND proceso='$machineName'");
+        if ($rowprep = mysqli_fetch_object($prepquery)) {
+            echo $rowprep->numodt;
+        }else{
+          echo "--";  
+        }
+        
     }
 ?>
       
@@ -571,8 +602,10 @@ if (@$_SESSION['logged_in'] != true) {
 </div>
  <form name="fvalida" id="fvalida" method="POST" onsubmit="saveTiro()">
  <input type="hidden" name="element" value="<?=$element ?>">
+ <input type="hidden" id="table-machine" name="table-machine" value="<?=(isset($_REQUEST['mm']))? $_REQUEST['mm'] : 1 ?>">
   <input type="hidden" name="section" value="tiraje">
  <input type="hidden" name="hour" value="<?= (isset($_POST['horadeldia'])) ? $_POST['horadeldia'] : $horaAjuste; ?>"> 
+ <input type="hidden" name="horainiciotiro" value="<?=date(" H:i:s", time()); ?>">
 <div class="statistics">
   <div class="left-sec" style="position: relative;">
       <div class="timersmall">
@@ -590,16 +623,16 @@ if (@$_SESSION['logged_in'] != true) {
     if (count($orderID)== 1) {
 ?>
           <div id="cantpedido">
-            <div> CANTIDAD DE PEDIDO</div>
-            <input id="pedido" class="darkinput" name="pedido" value="<?= $cpedido ?>" readonly  style="margin-right: 10px;">
+            
+            
           </div>
           <?php } ?>
           <div class="button-panel" id="leftbuttons">
                         <a href="#" onClick="endSesion()"> <img src=""  href="#" class="img-responsive"  />
                         <div class="square-button-h red">
-                          <img src="images/exit-door.png">
+                          <img src="images/sal.png">
                         </div></a>
-                        <div class="square-button-h green stop eatpanel goeat">
+                        <div class="square-button-h green stop eatpanel goeat" onclick="saveoperComida()">
                           <img src="images/dinner2.png">
                         </div>
                         <?php if (count($orderID)== 1) { ?>
@@ -607,10 +640,13 @@ if (@$_SESSION['logged_in'] != true) {
                           <img src="images/saving.png">
                         </div>
                         <?php } ?>
-                        <div class="square-button-h yellow   derecha goalert">
+                        <div class="square-button-h yellow   derecha goalert" onclick="saveoperAlert();">
                           <img src="images/warning.png">
-                        </div>
-                       <div class="square-button-h prple" onclick="pauseConfirm();">
+                        </div><a href="index2.php">
+                        <div  class="square-button-h prple" >
+                          <img src="images/volv.png">
+                        </div></a>
+                       <div style="display: none;" class="square-button-h prple" onclick="pauseConfirm();">
                           <div class="square-text"> PAUSAR Y CONTINUAR MAÑANA</div>
                         </div>
                         
@@ -685,7 +721,7 @@ foreach ($orderID as $odt) {
      <table id="former">
   <input  type="hidden" id="qty" name="qty" value="single" />
   <tr>
-    <td class="title-form">CANTIDAD RECIBIDA</td>
+    <td class="title-form">CANTIDAD DE PEDIDO</td>
     <td class="title-form">BUENOS</td>
   </tr>
   <tr>
@@ -696,28 +732,29 @@ foreach ($orderID as $odt) {
                 $merm = ($row->merma_recibida != null) ? $cantrecib - $cpedido : $cantrecib - $cpedido;
             }
 ?>
-    <td class=""><input id="cantidad" class="darkinput" name="cantidad" value="<?= $cantrecib ?>"  readonly></td>
+    <td class=""><input type="number" class="getkeyboard"  id="pedido"  name="pedido" value="<?=$cpedido ?>" readonly onclick="getKeys(this.id,'pedido')" onkeyup="opera();"  ></td>
    
    
-   <td class=""><input id="buenos"  name="buenos" type="number"  name="" style="margin-right: 10px;" required="required"></td>
+   <td class=""><input id="buenos" class="getkeyboard" onclick="getKeys(this.id,'buenos')"  name="buenos" type="number"  name="" onkeyup="opera();" readonly style="margin-right: 10px;" required="required"></td>
     
     
   </tr>
   <tr>
-    <td class="title-form">MERMA &nbsp&nbsp&nbsp&nbsp&nbsp DEFECTOS</td>
+    <td class="title-form">CANTIDAD RECIBIDA</td>
     <td class="title-form">PIEZAS DE AJUSTE</td>
   </tr>
   <tr>
-    <td class=""><input id="merma" class="darkinput" name="merma" type="number"  readonly value="<?= $merm ?>"  style="width: 75px;margin-right: 10px;" required="required"><input id="defectos" class="darkinput" name="defectos" type="number" value="0"  readonly  style="width: 75px;"></td>
-    <td class=""><input  id="piezas-ajuste" name="piezas-ajuste" type="number"    style="margin-right: 10px;" onkeyup="opera();" > </td>
+    <td class=""> <input type="number" id="cantidad" readonly onclick="getKeys(this.id,'cantidad')"  class="getkeyboard" name="cantidad" value="<?= $cantrecib ?>"  onkeyup="opera();">
+    <!-- <input id="merma" class="" name="merma" type="number"   value="<?= $merm ?>"  style="width: 75px;margin-right: 10px;" required="required"> --> </td>
+    <td class=""><input  id="piezas-ajuste" readonly class="getkeyboard" name="piezas-ajuste" type="number"  onclick="getKeys(this.id,'piezas-ajuste')"  style="margin-right: 10px;" onkeyup="GetDefectos()" > </td>
   </tr>
   <tr>
-    <td class="title-form">MERMA ENTREGADA</td>
-    <td class="title-form">ENTREGADOS</td>
+    <td class="title-form">MERMA</td>
+    <td class="title-form">DEFECTOS</td>
   </tr>
   <tr>
-    <td class=""><input class="darkinput" value="0" id="merma-entregada" name="merma-entregada" type="number" readonly   style="margin-right: 10px;" ></td>
-      <td class=""><input id="entregados" name="entregados" type="number" value="0" required="true" readonly style="background: #4C89DC; border:1px solid rgba(255,255,255,.5); color: #fff;"></td>
+    <td class=""><input class="" value="" readonly id="merma-entregada" onclick="getKeys(this.id,'merma-entregada')" name="merma-entregada" type="number"    style="margin-right: 10px;"></td>
+      <td class=""><input id="defectos"  onclick="getKeys(this.id,'defectos')" readonly class="getkeyboard" name="defectos" type="number" value=""    ><!--<input id="entregados" name="entregados" type="number" value="" required="true"  style="">--></td>
   </tr>
 </table>
 
@@ -761,7 +798,7 @@ foreach ($orderID as $odt) {
     <td class=""><input class="darkinput" id="avance" name="avance" type="number"  readonly  style="margin-right: 10px;"  value="<?= $buen ?>"> </td>
   </tr>
   <tr>
-    <td class="title-form">MERMA ENTREGADA</td>
+    <td  class="title-form">MERMA ENTREGADA</td>
     <td class="title-form">ENTREGADOS</td>
   </tr>
   <tr>
@@ -773,15 +810,15 @@ foreach ($orderID as $odt) {
         }
 ?>
 <?php
-    
+   
     while ($row = mysqli_fetch_object($resultado02)) {
         
 ?>
-                                                         
+                             <input hidden name="planillas" value="<?= $id['planillas_de'] ?>"/>                            
                             <input hidden id="producto" name="producto" class=" diseños" value="<?= $row->producto ?>"/>
                              <input hidden id="numodt" name="numodt" class="diseños" value="<?= implode(',', $orderID) ?>"/>
                              <input hidden id="odt" name="odt" class=" diseños" value="<?= $row->numodt ?>"/>
-                      <input hidden id="numproceso"  class=" diseños" value="<?= $row->proceso ?>"/>
+                      <input hidden id="numproceso"  class=" diseños" value="<?= $row->id_proceso ?>"/>
                              <?php
         
     }
@@ -836,13 +873,15 @@ foreach ($orderID as $odt) {
       <div class="container">
           
             <div id="estilo">
+
              <form id="alerta-tiro" name="alerta-tiro" method="post"  class="form-horizontal"  >
-                
+                <input type="hidden" name="tiro" value="<?=$id['last_tiraje'] ?>">
+                <input type="hidden" id="inicioAlerta" name="inicioAlerta">
                 <input hidden type="text"  name="logged_in" id="logged_in" value="<?php
     echo "" . $_SESSION['logged_in'];
 ?>" />
                 <input hidden  name="horadeldiaam" id="horadeldiaam" value="<?php
-    echo date(" H:i:s", time() - 28800);
+    echo date(" H:i:s", time());
 ?>" />
                 <input hidden name="fechadeldiaam" id="fechadeldiaam" value="<?php
     echo date("d-m-Y");
@@ -873,10 +912,10 @@ foreach ($orderID as $odt) {
                 <div class="form-group">
                   <div class="button-panel-small">
                        
-                        <div class="square-button-small red derecha stopalert start reset">
+                        <div class="square-button-small red derecha stopalert start reset" onclick="saveOperstatus()">
                           <img src="images/ex.png">
                         </div>
-                        <div id="savealerta" class="square-button-small derecha blue " onclick="showLoad(); saveAlert();">
+                        <div id="savealerta" class="square-button-small derecha blue " onclick="showLoad(); saveAlert();saveOperstatus();">
                           <img src="images/saving.png">
                         </div>
                         
@@ -904,6 +943,7 @@ foreach ($orderID as $odt) {
           -->  
            
       <div class="reloj-container2">
+      
         <div  id="relojajuste" class="relojajuste" ></div>
       </div>
       </div>
@@ -919,12 +959,14 @@ foreach ($orderID as $odt) {
           <div id="estilo" style="text-align: center;">
              <form id="fo4" name="fo4"  method="post" class="form-horizontal" >
                 <fieldset style="position: relative;left: -15px;">
-                
+                 <input type="hidden" name="act_tiro" value="<?=$id['last_tiraje'] ?>">
+                 <input type="hidden" name="curr-section" value="tiro">
+                 <input type="hidden" id="inicioAlertaEat" name="inicioAlertaEat">
                 <input hidden type="text"  name="logged_in" id="logged_in" value="<?php
     echo "" . $_SESSION['logged_in'];
 ?>" />
                 <input hidden name="horadeldiaam" id="horadeldiaam" value="<?php
-    echo date(" H:i:s", time() - 28800);
+    echo date(" H:i:s", time());
 ?>" />
                 <input hidden name="fechadeldiaam" id="fechadeldiaam" value="<?php
     echo date("d-m-Y");
@@ -941,10 +983,10 @@ foreach ($orderID as $odt) {
                    <div class="form-group" style="width:80% ;margin:0 auto;">
                 <label class="col-md-4 control-label" for="radios" style="display: none;"></label>
 
-              <div class=" radio-menu face  eatpanel" onclick="showLoad();submitEat();">
+              <div class=" radio-menu face  eatpanel" onclick="showLoad();submitEat();saveOperstatus();">
                 <input type="radio" class="" name="radios" id="radios-0" value="Comida">
                     COMIDA</div>
-               <div class=" radio-menu face eatpanel" onclick="showLoad();submitEat();">
+               <div class=" radio-menu face eatpanel" onclick="showLoad();submitEat();saveOperstatus();">
                <input type="radio" name="radios" id="radios-1" value="Sanitario" >
                    SANITARIO
                     
@@ -958,7 +1000,7 @@ foreach ($orderID as $odt) {
                 <div class="form-group">
                   <div class="button-panel-small">
                        
-                        <div  class="square-button-small red eatpanel stopeat start reseteat2 ">
+                        <div  class="square-button-small red eatpanel stopeat start reseteat2 " onclick="saveOperstatus()">
                           <img src="images/ex.png">
                         </div>
                         </div>
@@ -983,14 +1025,7 @@ foreach ($orderID as $odt) {
     </div>
                                     <script>
 
-                        $(document).ready(function(){
-                        $('#divPHOTO').css("background-image", "url('<?php
-    echo $_SESSION['MM_Foto_user'];
-?>')");  
-                        console.log('<?php
-    echo $_SESSION['MM_Foto_user'];
-?>');
-                    });
+                       
                                 </script>
 
       </div>
@@ -998,14 +1033,28 @@ foreach ($orderID as $odt) {
 </div>
 
 <!-- ********************** Termina Panel comida ******************** -->
+  <!-- ********************** Inicia Panel teclado ******************** -->
+   <div id="panelkeyboard">
+    <div class="cerrarkey">
+      <div id="close-down" class="square-button-micro red  ">
+                          <img src="images/ex.png">
+                        </div>
+    </div>
+    <div class="keycontainer">
+      <div id="softk" style="width: 80%;margin: 0 auto; text-align: center;" class="softkeys" data-target="input[name='buenos']"></div>
+    </div>
+    
+</div>
 
-  <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!-- ********************** Termina Panel teclado ******************** -->
+  <script src="js/libs/jquery-ui.js"></script>
  <script>
  $('.radio-menu').click(function() {
   $('.face-osc').removeClass('face-osc');
   $(this).addClass('face-osc').find('input').prop('checked', true)    
 });                         
                          $( "#saving").click(function() {
+
                           var buenos=$('#buenos').val();
                           var merma=$('#merma').val();
                           var entre=$('#entregados').val();
@@ -1020,14 +1069,15 @@ foreach ($orderID as $odt) {
 ?>                           tiempoTiraje
                             timer.pause();
                             $('#tiempoTiraje').val(timer.getTimeValues().toString());   
-                            $( "#formbutton" ).click();
+                           $( "#formbutton" ).click();
                              showLoad();
                             <?php
     } else {
 ?>
                                 if (buenos!=''&&ajuste!='') {
                                     timer.pause();
-                            $('#tiempoTiraje').val(timer.getTimeValues().toString());  
+                            $('#tiempoTiraje').val(timer.getTimeValues().toString()); 
+                            $('#close-down').click(); 
                              $( "#formbutton" ).click();
                              showLoad();
                            }else{
@@ -1131,7 +1181,10 @@ foreach ($orderID as $odt) {
   
   </div>
 <!-- ********************** Termina Ventana de pausar ordenes ******************** -->
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script>
+  
+</script>
+<script src="js/softkeys-0.0.1.js"></script>
 
-
-
-  <script src="js/tiraje.js"></script>
+  <script src="js/tiraje.js?v=9"></script>

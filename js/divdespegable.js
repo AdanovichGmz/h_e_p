@@ -5,13 +5,13 @@ $(document).ready(function () {
     $(".abajo").click(function () {
         if (p == false) {
 
-            $("#panelbottom2").animate({ top: '+=38%' }, 200);
-            $("#panelbottom").animate({ bottom: '+=62%' }, 200);
+            $("#panelbottom2").animate({ top: '+=3%' }, 200);
+            $("#panelbottom").animate({ bottom: '+=97%' }, 200);
             p = true;
         }
         else {
-            $("#panelbottom2").animate({ top: '-=38%' }, 200);
-            $("#panelbottom").animate({ bottom: '-=62%' }, 200);
+            $("#panelbottom2").animate({ top: '-=3%' }, 200);
+            $("#panelbottom").animate({ bottom: '-=97%' }, 200);
             p = false;
         }
 

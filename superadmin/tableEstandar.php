@@ -99,17 +99,17 @@ if ( $resultado) {
  
       function close_box()
       {
-        $('.backdrop, .box').animate({'opacity':'0'}, 300, 'linear');
+        
         $('.backdrop, .box').css('display', 'none');
       }
   function close_box2()
       {
-        $('.backdrop, .box2').animate({'opacity':'0'}, 300, 'linear');
+       
         $('.backdrop, .box2').css('display', 'none');
       }
       function close_box3()
       {
-        $('.backdrop, .box3').animate({'opacity':'0'}, 300, 'linear');
+        
         $('.backdrop, .box3').css('display', 'none');
       }
     </script>

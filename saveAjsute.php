@@ -1,10 +1,22 @@
 <?php
 
 require('saves/conexion.php');
+require('classes/functions.class.php');
+$log = new Functions();
+function logpost($post){
+  foreach ($post as $key => $value) {
+    $info.=$key.": ".$value." | ";
+  }
+  return $info;
 
-$radios=$_POST['radios'];
+}  
+session_start();
+$userID = $_SESSION['id'];
+date_default_timezone_set("America/Mexico_City"); 
+$radios=(isset($_POST['radios']))? $_POST['radios'] : 'Otro';
 $observaciones=$_POST['observaciones'];
-
+$tiro=$_POST['actual_tiro'];
+$inicioAlerta=$_POST['inicioAlerta'];
 //foreach ($_POST['opcion'] as $opcion); 
 
 $tiempoalertamaquina=$_POST['tiempoalertamaquina'];
@@ -14,15 +26,22 @@ $logged_in=$_POST['logged_in'];
 $horadeldiaam=$_POST['horadeldiaam'];
 $fechadeldiaam=$_POST['fechadeldiaam'];
 
-$query2="SELECT id FROM login WHERE logged_in='$logged_in'";
-$query4="SELECT idmaquina FROM maquina WHERE mac='$maquina'";
-$getID = mysqli_fetch_assoc($mysqli->query($query2));
-$userID = $getID['id'];
-$getMachine = mysqli_fetch_assoc($mysqli->query($query4));
-$machineID = $getMachine['idmaquina'];
+//$query2="SELECT id FROM login WHERE logged_in='$logged_in'";
+//$query4="SELECT idmaquina FROM maquina WHERE mac='$maquina'";
+//$getID = mysqli_fetch_assoc($mysqli->query($query2));
+//$userID = $getID['id'];
+//$getMachine = mysqli_fetch_assoc($mysqli->query($query4));
+$machineID = $_SESSION['machineID'];
+$horafin=date(" H:i:s", time());
+if ($radios=='Preparar Tinta') {
+	$query="INSERT INTO alertageneralajuste (radios, observaciones, tiempoalertamaquina, id_maquina, id_usuario, horadeldiaam,horafin_alerta, fechadeldiaam,id_tiraje,es_tiempo_muerto) VALUES ('$radios','$observaciones','$tiempoalertamaquina','$machineID','$userID','$inicioAlerta', '$horafin', '$fechadeldiaam',$tiro,2)";
+}else{
+	$query="INSERT INTO alertageneralajuste (radios, observaciones, tiempoalertamaquina, id_maquina, id_usuario, horadeldiaam,horafin_alerta, fechadeldiaam,id_tiraje) VALUES ('$radios','$observaciones','$tiempoalertamaquina','$machineID','$userID','$inicioAlerta', '$horafin', '$fechadeldiaam',$tiro)";
+}
 
-
-$query="INSERT INTO alertageneralajuste (radios, observaciones, tiempoalertamaquina, id_maquina, id_usuario, horadeldiaam, fechadeldiaam) VALUES ('$radios','$observaciones','$tiempoalertamaquina','$machineID','$userID','$horadeldiaam','$fechadeldiaam')";
+ $log->lwrite($_POST['logged_in'].": ".logpost($_POST),'ALERTAS_AJUSTE_'.date("d-m-Y"));
+$log->lwrite("Hora fin alerta: ".$horafin,'ALERTAS_AJUSTE_'.date("d-m-Y"));
+$log->lwrite("---------------------------",'ALERTAS_AJUSTE_'.date("d-m-Y"));
 
 
 $resultado=$mysqli->query($query);
@@ -30,6 +49,7 @@ $resultado=$mysqli->query($query);
 //print_r($_POST) ;
 if ( $resultado) {
 print_r($_POST);
+echo $query;
  }else{
             printf("Errormessage: %s\n", $mysqli->error);
           }

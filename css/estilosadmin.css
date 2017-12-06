@@ -266,6 +266,7 @@ position: relative;
 	width: 30px;
 	height: 30px;
 	background-image: url('../images/off.png');
+	background-repeat: no-repeat;
 	background-position: center;
 	background-size: contain;
 	margin: 0 auto;
@@ -277,6 +278,7 @@ position: relative;
 	height: 30px;
 	background-image: url('../images/completed.png');
 	background-position: center;
+	background-repeat: no-repeat;
 	background-size: contain;
 	margin: 0 auto;
 	
@@ -627,6 +629,20 @@ border-top: 1px solid #444444!important;
 }
 .mini-left input{
 	margin-left: 20%;
+}
+.mini-left2{
+	float: left;width: 50%;
+	text-align: center;
+}
+.mini-right2{
+	float: right;width: 50%;
+	text-align: center;
+}
+.mini-left2 input{
+	margin-left: 6%;
+}
+.mini-right2 button{
+	display: inline-block;
 }
 #vhead td:nth-child(even){}
 .fix{

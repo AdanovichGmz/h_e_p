@@ -478,7 +478,7 @@ $(".finish").click(function () {
  function saveEncuesta(){
          event.preventDefault();
          //var mac=$('#mac').val();
-        
+        localStorage.removeItem('myTime');
          $.ajax({  
                       
                      type:"POST",

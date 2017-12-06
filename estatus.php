@@ -1,159 +1,6 @@
- <?php
- date_default_timezone_set("America/Mexico_City");
-error_reporting(0);
-if( !session_id() )
-{
-    session_start();
-    
-
-}
-if(@$_SESSION['logged_in'] != true){
-    echo '
-     <script>
-        alert("No has iniciado sesion");
-        self.location.replace("index.php");
-    </script>';
-}else{
-    echo '';
-}
-
-    ?>
-
-  <?php
-   function personalData($idmaquina,$maquina,$photo){
-require('saves/conexion.php');
-
-    $query1 = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT nombre_elemento FROM elementos WHERE id_elemento=o.producto) AS nombre_elemento,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$maquina' HAVING status='actual' ";
-    
-    $actual = $mysqli->query($query1);
-     
-    $query2 = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT nombre_elemento FROM elementos WHERE id_elemento=o.producto) AS nombre_elemento,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$maquina' HAVING status='siguiente' ";
-    
-    $siguiente = $mysqli->query($query2);
-    $resultado02_5 = $mysqli->query($query2);
-    $query3 = "SELECT o.*,p.proceso,p.id_proceso,(SELECT orden_display FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS orden_display,(SELECT nombre_elemento FROM elementos WHERE id_elemento=o.producto) AS nombre_elemento,(SELECT status FROM orden_estatus WHERE id_orden=o.idorden AND id_proceso=p.id_proceso) AS status FROM ordenes o INNER JOIN procesos p ON p.id_orden=o.idorden WHERE nombre_proceso='$maquina' HAVING status='preparacion' ";
-    
-    $preparacion = $mysqli->query($query3);
-
-     $row = mysqli_fetch_object($actual);
-     $row2 =mysqli_fetch_assoc($actual);
-     
-      $act = (!empty($row->numodt))? $row->numodt : '--';
-      $nom_act=(!empty($row->producto))? $row->nombre_elemento : '';
-      $element   = $idmaquina;
-    
-      
-      $row2 = mysqli_fetch_object($siguiente);
-      $sig = (!empty($row2->numodt))? $row2->numodt : '--';
-      $nom_sig=(!empty($row2->producto))? $row2->nombre_elemento : '';
-            
-          
-      $row3 = mysqli_fetch_object($preparacion);
-      $prep = (!empty($row3->numodt))? $row3->numodt : '--';
-      $nom_prep=(!empty($row3->producto))? $row3->nombre_elemento : '';
-
-       /****************** Calcular ETE ******************/
-    $today     = date("d-m-Y");
-    $etequery1 = "SELECT COALESCE((SELECT  IFNULL(SUM( TIME_TO_SEC( tiempoTiraje) ),0)  FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today')+(SELECT  IFNULL(SUM( TIME_TO_SEC( tiempo_ajuste)),0) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_ajuste = '$today')+(SELECT  IFNULL(SUM( TIME_TO_SEC( tiempoalertamaquina) ),0)  FROM alertamaquinaoperacion WHERE id_maquina=$idmaquina AND fechadeldiaam = '$today') + (SELECT  IFNULL(SUM( TIME_TO_SEC(tiempoalertamaquina) ),0) FROM alertageneralajuste WHERE id_maquina=$idmaquina AND fechadeldiaam = '$today')) as tiempo_real";
-    //obtenemos el tiempo muerto sumando las idas al sanitario
-    $etequery2 = "SELECT  IFNULL(SUM( TIME_TO_SEC( breaktime) ),0) AS tiempo_muerto  FROM breaktime WHERE id_maquina=$idmaquina AND radios='Sanitario' AND fechadeldiaam = '$today'";
-    //obtenemos la calidad a la primera operando entregados-defectos*100/cantidadpedida  
-    $etequery3 = "SELECT COALESCE((SELECT SUM( entregados ) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today')/ (SELECT SUM(cantidad) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today'))*100 as calidad_primera";
-    
-    //obtenemos desempeño operando entregados+merma
-    $etequery4 = "SELECT SUM(desempenio) AS desemp ,COUNT(desempenio) AS tirajes,SUM(produccion_esperada) AS esper FROM `tiraje` WHERE fechadeldia_tiraje='$today' AND id_maquina=$idmaquina";
-    $etequery5 = "SELECT COALESCE((SELECT SUM(entregados) FROM tiraje WHERE id_maquina=$idmaquina AND fechadeldia_tiraje = '$today')) as desempenio";
-    //obtenemos el elemento o producto
-    $getelement = mysqli_fetch_assoc($resultado02_5);
-    $element    = $getelement['producto'];
-    $begin      = new DateTime('09:00');
-    $current    = new DateTime(date('H:i'));
-    //obtenemos el tiempo transcurrido desde el inicio del dia hasta el momento actual
-    $interval   = $begin->diff($current);
-    //echo $interval->format("%H:%I");
-    $time_diff  = $interval->format("%H:%I:%S");
-    $timeArr    = array_reverse(explode(":", $time_diff));
-    $seconds    = 0;
-    foreach ($timeArr as $key => $value) {
-        if ($key > 2)
-            break;
-        $seconds += pow(60, $key) * $value;
-    }
-    //obtenemos el estandar de piezas por hora para el elemento y proceso actual
-    if ($element!='') {
-      $standar_query2 = "SELECT * FROM estandares WHERE id_maquina=$idmaquina AND id_elemento= $element";
-    
-    $getstandar     = mysqli_fetch_assoc($mysqli->query($standar_query2));
-    $estandar       = $getstandar['piezas_por_hora'];
-    
-    
-    
-    
-    $getdeadTime = mysqli_fetch_assoc($mysqli->query($etequery2));
-    $deadTime    = $getdeadTime['tiempo_muerto'];
-    
-    $gettotalTime = mysqli_fetch_assoc($mysqli->query($etequery1));
-    $totalTime    = $gettotalTime['tiempo_real'] - $getdeadTime['tiempo_muerto'];
-    
-    $getQuality = mysqli_fetch_assoc($mysqli->query($etequery3));
-    $Quality    = $getQuality['calidad_primera'];
-    $getdesemp= $mysqli->query($etequery4);
-    $getEfec       = mysqli_fetch_assoc($getdesemp);
-    //obtenemos el porcentaje de estandar segundos*estandar/1hora
-    $estandar_prod = ($seconds * $estandar) / 3600;
-    
-    $desempenio =($getEfec['tirajes']>0)? ($getEfec['desemp']*100)/($getEfec['tirajes']*100) : 0;
-    //echo $etequery3;
-    //$realtime   = ($totalTime * 1) / 3600;
-    
-    $dispon     = ($totalTime * 100) / $seconds;
-    //$disponible = round($dispon, 1);
-    $disponible = round($dispon);
-    
-    $real       = mysqli_fetch_assoc($mysqli->query($etequery5));
-
-
-    //echo "<p style='color:#fff;'>dispon ".$dispon." calidad ".$Quality." desempeño ".$desempenio." prod esperada ".$getEfec['esper']." real ".$real['desempenio']." calidad ".$Quality." tiempo hasta ahora: ".$seconds."</p>";
-    
-    $getEte     = (($dispon / 100) * ($Quality / 100) * ($desempenio / 100)) * 100;
-    
-    $showpercent=100 - $getEte; }else{$getEte=0;}
-  /****************** Calcular ETE ******************/
-          
-
-    
-    $credencial='<div class="ete-photo"><div class="person-photo" style=background:url("images/'.$photo.'.png")></div>
-    <div class="ete-num">'.round($getEte).'%</div>
-    </div>
-    <div class="ete-stat">
-      <table>
-      <thead>
-      <tr class="trh">
-        <td>Actual</td>
-        <td class="">Siguiente</td>
-        <td>Preparacion</td>
-        </tr></thead>
-        <tbody>
-        <tr style="font-size: 10px;"><td>&nbsp</td>
-        <td>&nbsp</td>
-        <td>&nbsp</td></tr>
-        <tr class="trb">
-          <td>'.$act." <div class='nombre_elemento'>".$nom_act.'</div></td>
-          <td class="middletd">'.$sig." <div class='nombre_elemento'>".$nom_sig.'</div></td>
-          <td>'.$prep." <div class='nombre_elemento'>".$nom_prep.'</div></td>
-        </tr>
-        </tbody>
-      </table>
-    </div>';
-  echo $credencial;
-}
-
-
-  ?>
-
- 
-
-  
+  <?php 
+  date_default_timezone_set("America/Mexico_City");
+  session_start(); ?>   
 <!DOCTYPE html>
 
 <html lang="en" dir="ltr" xmlns:fb="http://ogp.me/ns/fb#">
@@ -172,16 +19,16 @@ require('saves/conexion.php');
   
 
 
-    <link href="css/estilosadmin.css" rel="stylesheet" />
+    <link href="../css/estilosadmin.css" rel="stylesheet" />
 
    
-  <link rel="stylesheet" href="fonts/style.css">
+  <link rel="stylesheet" href="../fonts/style.css">
   <script src="http://code.jquery.com/jquery-latest.js"></script>
-  <script src="js/main.js"></script>
+  <script src="../js/main.js"></script>
 
 
   
-  <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.7.2.custom.css" />
+  <link rel="stylesheet" type="text/css" href="../css/jquery-ui-1.7.2.custom.css" />
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
   <style>
@@ -215,21 +62,31 @@ require('saves/conexion.php');
   src:  url('fonts/MontseLight.otf');
  
 }
-
+.machinename{
+  width: 100%;
+  height: 30px;
+  position:relative;
+  color:#3F4553;
+  line-height: 30px;
+  font-weight: normal;
+  font-size: 20px;
+  text-transform: uppercase;
+}
     .prod-container{
       width: 100%;
       text-align: center;
     }
     .personal{
       width: 31%;
-    background-color: #333333;
-    height: 22em;
+    background-color: #fff;
+    
     display: inline-block;
     border-radius: 5px;
     margin: 10px;
     vertical-align: top;
     position: relative;
     font-family: "monse";
+    
 
     }
     .personal:hover{
@@ -240,21 +97,22 @@ require('saves/conexion.php');
     .person-photo{
       width: 90px;
       height: 90px;
-      background: #383838;
+      
       position: absolute;
       top: 10px;
       left: 10px;
       background-size: contain!important;
-      border: 1px solid #777878;
+      border: 1px solid #E6E8E7;
     }
     .ete-photo{
       height: 110px;
       width: 100%;
-      background: #212121;
+      
       position: relative;
-      border-top-left-radius:5px;
-      border-top-right-radius:5px;
-     
+      border-top-left-radius:3px;
+      border-top-right-radius:3px;
+     z-index: 100;
+     background: #F9F9F9;
 
     }
     .ete-num{
@@ -264,8 +122,8 @@ require('saves/conexion.php');
       top: 10px;
       right: 18px;
       line-height: 90px;
-      font-size: 50px;
-      color: #B7D8F3;
+      font-size: 70px;
+      color: #272B34;
       text-align: right;
     }
     .ete-stat{
@@ -283,8 +141,8 @@ require('saves/conexion.php');
 
     }
     .ete-stat thead{
-     font-size: 18px;
-     color: #979999;
+     font-size: 25px;
+     color: #272B34;
       
     }
     .ete-stat td{
@@ -292,13 +150,13 @@ require('saves/conexion.php');
     }
     .trh{
       height: 50px;
-      background:#393939;
-      border-bottom: 1px solid #444444;
-      border-top: 1px solid #444444;  
+      background: #F9F9F9;
+      font-weight: bolder;
+       
     }
     .middletd{
-      border-right: 1px dashed #444444;
-      border-left: 1px dashed #444444;
+      border-right: 1px dashed #E6E8E7;
+    border-left: 1px dashed #E6E8E7;
     }
     .trb{
       line-height: 24px;
@@ -307,32 +165,142 @@ require('saves/conexion.php');
       font-size: 13px;
       width: 100%;
     }
-  </style>
-</head>
-<body style="">
-
-
-
-<div class="prod-container">
-  <div class="personal">
-    <?=personalData(1,'Corte','4'); ?>
-  </div>
-  <div class="personal">
-    <?=personalData(2,'Suaje','5'); ?>
-  </div>
-  <div class="personal">
-    <?=personalData(3,'Serigrafia','6'); ?>
-  </div>
-  <div class="personal">
-    <?=personalData(4,'Original','7'); ?>
-  </div>
-  <div class="personal">
-    <?=personalData(5,'Placa','8'); ?>
-  </div>
-  <div class="personal">
-    <?=personalData(6,'Laser','9'); ?>
-  </div>
+    .prod-container{
+      background: #E5E9EC!important;
+    }
+.disabled{
+  opacity: 0.4
+}
+#cuerpito{
  
-</div>
+  background: #E5E9EC!important;
+}
+@media screen and (max-width: 1025px) {
+.ete-stat table{
+      
+      font-size: 10px;
+      
+
+    }
+    .ete-stat thead{
+     font-size: 18px;
+     
+      
+    }
+    
+}
+    @media screen and (max-width: 768px) {
+ 
+ .personal{
+ width:45%;
+ }
+
+}
+
+.fade {
+   width: 100%;
+  height: 100%;
+  background-color:#E9573E;
+ transition: opacity 0.6s ease-in-out;
+ position: absolute;
+  border-radius:5px;
+  
+
+}
+
+@media screen and (max-width: 412px) {
+ 
+ .personal{
+ width:90%;
+ }
+
+}
+.ajuste{
+  background: #31A1CF!important;
+
+}
+.ajuste div{
+  color:#fff!important;
+}
+.alerta{
+  background: #FFCF6B!important;
+}
+.tiro{
+  background: #67BE4B!important;
+}
+.tiro div{
+  color:#fff!important;
+}
+.comida{
+  
+}
+
+.santa{
+  background-image: url('images/san.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  position: absolute;
+ 
+  width: 60px;
+  height: 60px;
+  top:-10px;
+  left: 35px;
+}
+  </style>
+   <script type="text/javascript" src="https://www.google.com/jsapi"></script> 
+  
+</head>
+<body id="cuerpito">
+
+<?php include 'estatus_content.php'; 
+
+?>
+
+
 </body>
 </html>
+<script>
+<?php 
+require('saves/conexion.php');
+$today=date("d-m-Y");
+ 
+  $turn_on=$mysqli->query("SELECT e.maquina,(SELECT nommaquina FROM maquina WHERE idmaquina=e.maquina) AS nom_maquina FROM operacion_estatus e WHERE fecha='$today'");
+if (!$turn_on) {
+  printf($mysqli->error);
+}
+?>
+$(document).ready(function(){
+  var one = $(window).height();
+  $('body').height(one);
+  $('.personal').height((one/2)-25);
+var grafics2=((wind/2)-25)-140;
+$('.ete-stat').height(grafics2);
+  
+ alerttime();
+setInterval(function() {
+            
+              //$('#cuerpito').hide().fadeIn('slow'); 
+                  $('#cuerpito').load('estatus_content.php', function(resp, status, xhr) {<?php while ( $turn_row=mysqli_fetch_assoc($turn_on)) {
+ echo "draw".$turn_row['nom_maquina']."Chart();";
+} ?>});
+                          //$('#cuerpito').show().fadeIn(3000);
+                          
+                }, 10000);
+setInterval(function() {
+  location.reload();
+}, 300000);
+
+                });
+   
+      function alerttime(){
+  
+  animacion = function(){
+  
+  $('.outtime').toggleClass('fade');
+ 
+}
+setInterval(animacion, 550);
+
+}  
+</script>

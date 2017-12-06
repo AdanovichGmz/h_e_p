@@ -15,7 +15,9 @@ if(@$_SESSION['logged_in'] != true){
 }else{
     echo '';
 }
+
 require('../saves/conexion.php');
+
     ?>
 
 <?php
@@ -191,7 +193,9 @@ require('../saves/conexion.php');
 }
    
 
-
+#texcel{
+  display: none;
+}
 
 #buscar{
   width: 300px;
@@ -206,6 +210,10 @@ require('../saves/conexion.php');
 }
 
   </style>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   
 </head>
 <body style="">
@@ -224,10 +232,18 @@ require('../saves/conexion.php');
   <div class="left-form2">
  <form  method="post" action="../pdfrepajustemaquina/createPdf.php" target="_blank" >
    <p>Generar Reporte</p>
-   <div class="mini-left"><input id="id" name="id" type="text" placeholder="Ingresa el ODT" class="form-control input-md" required="">
-<input hidden  name="datepicker" id="fechadeldia" value="<?php echo date("d/m/Y"); ?>" />
+   <div class="mini-left2">
+<input id="datepicker" required="true" value="" name="id" />
+<select name="iduser" required="true">
+  <option value="14">Arturo</option>
+  <option value="16">Armando</option>
+  <option value="8">Eduardo</option>
+  <option value="2">Developer</option>
+  <option value="11">El Poncho</option>
+</select>
+<div id="hidetable"></div>
    </div>
-   <div class="mini-right"> <button id="button1id" name="button1id" class="btn btn-primary">Generar</button></div>
+   <div class="mini-right2"> <button id="button1id" name="button1id" class="btn btn-primary">PDF</button><button style="margin-left: 5px;" type="button" class="btn btn-primary" onclick="getExcel();">EXCEL</button></div>
  </form>
  </div>
  
@@ -331,6 +347,7 @@ if($num_page>1)
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> 
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../js/paging.js"></script> 
+<script type="text/javascript" src="../js/libs/jquery.table2excel.js"></script> 
 <script type="text/javascript">
             $(document).ready(function() {
                 //$('#tableData').paging({limit:20});
@@ -381,6 +398,29 @@ if($num_page>1)
                            
                         });
                       });
+                        function getExcel(){
+                          var fecha=$('#datepicker').val();
+                          if (fecha=='') {
+                            alert('elige una fecha per favore!!');
+
+                          }else{
+                            $.ajax({
+                                type: 'POST',
+                                url: 'ExportToExcel.php',
+                                data: {fecha:fecha},
+                                // Mostramos un mensaje con la respuesta de PHP
+                                success: function(data) {
+                                    console.log(data);
+                                    $('#hidetable').html(data);
+                                    $('#texcel').table2excel({
+                                    exclude: ".noExl",
+                                    name: "Worksheet Name",
+                                    filename: "Reporte_"+fecha
+                                  }); 
+                                }
+                            })
+                          }
+                        }
                     </script>
 
 
@@ -400,3 +440,8 @@ if($num_page>1)
 
 </body>
 </html>
+<script>
+  $( function() {
+    $( "#datepicker" ).datepicker("option",'dateFormat', 'dd-mm-yy' );
+  } );
+  </script>

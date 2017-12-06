@@ -6,9 +6,9 @@ $start_from = ($page-1) * $limit;
 $term = $_REQUEST['condition']; 
 
 if ($term!='') {
-	$sql = "SELECT idorden,numodt FROM ordenes WHERE entregado NOT IN('true') AND numodt LIKE '%" . $term . "%' ORDER BY idorden LIMIT $start_from, $limit"; 
+	$sql = "SELECT idorden,numodt FROM ordenes WHERE   numodt LIKE '%" . $term . "%' ORDER BY idorden LIMIT $start_from, $limit"; 
  } else{
- 	$sql = "SELECT idorden,numodt FROM ordenes WHERE entregado NOT IN('true') ORDER BY idorden ASC LIMIT 0, $limit"; 
+ 	$sql = "SELECT idorden,numodt FROM ordenes WHERE ORDER BY idorden ASC LIMIT 0, $limit"; 
  }
 $rs_result = $mysqli->query($sql); 
 
